@@ -41,8 +41,6 @@ class Draw:
         stench_img = pg.image.load("assets/cell_stench.png")
         wumpus_img = pg.image.load("assets/cell_wumpus.png")
 
-        
-
         for row in range(WORLD_SIZE):
             for col in range(WORLD_SIZE):
                 cell_type = world[row][col]
@@ -52,14 +50,42 @@ class Draw:
 
                 if cell_type == 'B':
                     self.screen.blit(breeze_img, (x, y))
-                elif cell_type == 'G':
+                elif cell_type == 'BS':
+                    self.screen.blit(breeze_stench_img, (x, y))
+                elif cell_type == 'G' or cell_type == 'BG'  or cell_type == 'GS' or cell_type == 'BGS':
                     self.screen.blit(gold_img, (x, y))
-                elif cell_type == 'P':
+                elif cell_type == 'P' or cell_type == 'BP' or cell_type == 'PS' or cell_type == 'BPS':
                     self.screen.blit(pit_img, (x, y))
                 elif cell_type == 'S':
                     self.screen.blit(stench_img, (x, y))
-                elif cell_type == 'W':
+                elif cell_type == 'W' or cell_type == 'BW':
                     self.screen.blit(wumpus_img, (x, y))
+
+    def fill_environment(self, row, col, world):
+        breeze_img = pg.image.load("assets/cell_breeze.png")
+        breeze_stench_img = pg.image.load("assets/cell_breeze-stench.png")
+        gold_img = pg.image.load("assets/cell_gold.png")
+        pit_img = pg.image.load("assets/cell_pit.png")
+        stench_img = pg.image.load("assets/cell_stench.png")
+        wumpus_img = pg.image.load("assets/cell_wumpus.png")
+
+        cell_type = world[row][col]
+
+        x = mg_x + col * space
+        y = mg_y + row * space
+
+        if cell_type == 'B':
+            self.screen.blit(breeze_img, (x, y))
+        elif cell_type == 'BS':
+            self.screen.blit(breeze_stench_img, (x, y))
+        elif cell_type == 'G' or cell_type == 'BG'  or cell_type == 'GS' or cell_type == 'BGS':
+            self.screen.blit(gold_img, (x, y))
+        elif cell_type == 'P' or cell_type == 'BP' or cell_type == 'PS' or cell_type == 'BPS':
+            self.screen.blit(pit_img, (x, y))
+        elif cell_type == 'S':
+            self.screen.blit(stench_img, (x, y))
+        elif cell_type == 'W' or cell_type == 'BW':
+            self.screen.blit(wumpus_img, (x, y))
                     
 
         

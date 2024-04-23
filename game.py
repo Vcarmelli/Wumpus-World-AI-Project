@@ -5,7 +5,7 @@ WORLD_SIZE = 4
 class WumpusWorld:
     def __init__(self):
         self.world = [[''] * 4 for _ in range(4)] 
-        self.world[0][0] = 1
+        self.world[0][0] = 'A'
         self.cur_row = 0
         self.cur_col = 0
 
@@ -13,7 +13,7 @@ class WumpusWorld:
         self.cur_row = 0
         self.cur_col = 0
         self.world = [[''] * 4 for _ in range(4)] 
-        self.world[0][0] = 1
+        self.world[0][0] = 'A'
 
     def random_gold_wumpus_pits(self):
         coordinates = set()  # Use a set to ensure uniqueness
@@ -24,14 +24,12 @@ class WumpusWorld:
         return list(coordinates)
     
     def assign_environment(self, x, y, character):
-        if 0 <= x < 4 and 0 <= y < 4:
-            current_char = self.world[x][y]
-            if current_char != 0:
-                self.world[x][y] = str(current_char) + character
-            else:
-                self.world[x][y] = character
+        if 0 <= x < WORLD_SIZE and 0 <= y < WORLD_SIZE:
+            current_chars = set(self.world[x][y])
+            current_chars.add(character)
+            self.world[x][y] = ''.join(sorted(current_chars))
         else:
-            print("Error: Coordinates out of bounds!")
+            #print("Error: Coordinates out of bounds!")
             pass
 
     def check_char(self, cell, letter):
@@ -53,6 +51,7 @@ class WumpusWorld:
                         self.assign_environment(x, y-1, adj)
                         self.assign_environment(x+1, y, adj)
                         self.assign_environment(x-1, y, adj)
+
 
     def prepare_environment(self):
         g_w_p_coords = self.random_gold_wumpus_pits()
