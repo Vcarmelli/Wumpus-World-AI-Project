@@ -1,8 +1,10 @@
 import random
 
+WORLD_SIZE = 4
+
 class WumpusWorld:
     def __init__(self):
-        self.world = [[0] * 4 for _ in range(4)] 
+        self.world = [[''] * 4 for _ in range(4)] 
         self.world[0][0] = 1
         self.cur_row = 0
         self.cur_col = 0
@@ -10,7 +12,7 @@ class WumpusWorld:
     def reset_world(self):
         self.cur_row = 0
         self.cur_col = 0
-        self.world = [[0] * 4 for _ in range(4)] 
+        self.world = [[''] * 4 for _ in range(4)] 
         self.world[0][0] = 1
 
     def random_gold_wumpus_pits(self):
@@ -29,7 +31,7 @@ class WumpusWorld:
             else:
                 self.world[x][y] = character
         else:
-            #print("Error: Coordinates out of bounds!")
+            print("Error: Coordinates out of bounds!")
             pass
 
     def check_char(self, cell, letter):
@@ -42,20 +44,15 @@ class WumpusWorld:
         return False
 
     def add_stench_breeze(self):
-        for x in range(len(self.world)):
-            for y in range(len(self.world[x])):
-                if self.check_char([self.world[x][y]], 'W'):
-                    #if char == 'W':
-                    self.assign_environment(x, y+1, 'S')
-                    self.assign_environment(x, y-1, 'S')
-                    self.assign_environment(x+1, y, 'S')
-                    self.assign_environment(x-1, y, 'S')
-                elif self.check_char([self.world[x][y]], 'P'):                   
-                    self.assign_environment(x, y+1, 'B')
-                    self.assign_environment(x, y-1, 'B')
-                    self.assign_environment(x+1, y, 'B')
-                    self.assign_environment(x-1, y, 'B')
-                    
+        w_b = { 'W': 'S', 'P': 'B'}
+        for x in range(WORLD_SIZE):
+            for y in range(WORLD_SIZE):
+                for key, adj in w_b.items():
+                    if self.check_char([self.world[x][y]], key):
+                        self.assign_environment(x, y+1, adj)
+                        self.assign_environment(x, y-1, adj)
+                        self.assign_environment(x+1, y, adj)
+                        self.assign_environment(x-1, y, adj)
 
     def prepare_environment(self):
         g_w_p_coords = self.random_gold_wumpus_pits()
@@ -66,8 +63,7 @@ class WumpusWorld:
         self.add_stench_breeze()
 
         self.print_world(self.world)
-        
-        
+
         
     def print_world(self, array):    
         print("+" + "-" * 23 + "+")
@@ -82,8 +78,8 @@ class WumpusWorld:
         
 
 
-if __name__ == '__main__':
-    ww = WumpusWorld()
-    ww.prepare_environment()
+# if __name__ == '__main__':
+#     ww = WumpusWorld()
+#     ww.prepare_environment()
 
         

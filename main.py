@@ -35,6 +35,8 @@ def wumpus_world():
     
     game_bg = pg.image.load("assets/game-bg.png")
     screen.blit(game_bg, (0,0))
+    
+    ww.prepare_environment()
     while True:
         
         MOUSE_POS = pg.mouse.get_pos()
@@ -84,11 +86,12 @@ def wumpus_world():
                     draw.fill_path(row, col, GREEN)
                 draw.fill_path(ww.cur_row, ww.cur_col, AQUA)
 
+        draw.environment(ww.world)
         draw.board()
         pg.display.update()
 
 def main():
-    menu_bg = pg.image.load("assets/background-3.png")
+    menu_bg = pg.image.load("assets/background.png")
     screen.blit(menu_bg, (0,0))
     
     draw = Draw(screen)
