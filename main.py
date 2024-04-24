@@ -41,9 +41,9 @@ def wumpus_world():
         
         MOUSE_POS = pg.mouse.get_pos()
 
-        btn_ai = Button((570, 250), "Play AI", BLUE, LIGHT_GREEN)
+        btn_ai = Button((570, 230), "Play AI", BLUE, LIGHT_GREEN)
         btn_reset = Button((570, 300), "Reset Game", BLUE, LIGHT_GREEN)
-        btn_back = Button((570, 200), "Menu", BLUE, LIGHT_GREEN)
+        btn_back = Button((570, 370), "Menu", BLUE, LIGHT_GREEN)
        
         for button in [btn_ai, btn_reset, btn_back]:
             button.update_color(MOUSE_POS)
@@ -56,7 +56,7 @@ def wumpus_world():
             if event.type == pg.MOUSEBUTTONDOWN:
                 
                 if btn_reset.click_button(MOUSE_POS):
-                    ww.reset_world()
+                    wumpus_world()
 
                 if btn_back.click_button(MOUSE_POS):
                     main()
@@ -94,18 +94,42 @@ def wumpus_world():
         draw.board()
         pg.display.update()
 
+def description():
+    game_bg = pg.image.load("assets/description-bg.png")
+    screen.blit(game_bg, (0,0))
+    
+    while True:
+        
+        MOUSE_POS = pg.mouse.get_pos()
+
+        btn_back = Button((710, 490), "Back \u25BA", BLUE, LIGHT_GREEN)
+       
+        btn_back.update_color(MOUSE_POS)
+        btn_back.draw_button_transparent(screen)
+
+        for event in pg.event.get():
+            
+            if event.type == pg.QUIT: sys.exit()
+
+            if event.type == pg.MOUSEBUTTONDOWN:
+
+                if btn_back.click_button(MOUSE_POS):
+                    main()
+        
+        pg.display.update()
+
+
+
 def main():
     menu_bg = pg.image.load("assets/background.png")
     screen.blit(menu_bg, (0,0))
-    
-    draw = Draw(screen)
 
     while True:
 
         MOUSE_POS = pg.mouse.get_pos()
 
         start = Button((370, 480), "Start Game", BLUE, LIGHT_GREEN)
-        controls = Button((720, 490), "?", BLUE, LIGHT_GREEN)
+        controls = Button((485, 480), "?", BLUE, LIGHT_GREEN)
        
         for button in [start, controls]:
             button.update_color(MOUSE_POS)
@@ -120,10 +144,12 @@ def main():
                 if start.click_button(MOUSE_POS):
                     wumpus_world()
 
+                if controls.click_button(MOUSE_POS):
+                    description()
+
         pg.display.update()
     
     
-
 
 if __name__ == "__main__":
     main()

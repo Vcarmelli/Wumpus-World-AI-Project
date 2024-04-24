@@ -61,13 +61,7 @@ class WumpusWorld:
             pass      
 
     def check_char(self, cell, letter):
-        for string in cell:
-            for char in str(string):
-                if char == letter:
-                    return True
-            #     print("let", let)
-            # print("char", char)
-        return False
+        return any(letter in string for string in cell)
 
     def add_stench_breeze(self):
         w_b = { 'W': 'S', 'P': 'B'}
@@ -99,6 +93,8 @@ class WumpusWorld:
                     self.remove_char(x, y, 'A')
 
     def move_agent(self, x, y):
+        self.agent.reset_sensor()
+
         self.locate_agent()
         self.assign_environment(x, y, 'A')
         self.agent.location = (x, y)
@@ -106,17 +102,19 @@ class WumpusWorld:
         return
 
     def perceive_agent(self, x, y):
-        if self.check_char(self.world[x][y], 'S'):
-            self.agent.perceive('Stench')
-        if self.check_char(self.world[x][y], 'B'):
+        cell = self.world[x][y]
+        if self.check_char(cell, 'B'):
             self.agent.perceive('Breeze')
-        if self.check_char(self.world[x][y], 'G'):
+        if self.check_char(cell, 'G'):
             self.agent.perceive('Glitter')
+        if self.check_char(cell, 'S'):
+            self.agent.perceive('Stench')
         if not self.is_valid(x, y):
             self.agent.perceive('Bump')
 
         # WUMPUS DIED
         # Perceive scream
+
 
 
 class Agent:
@@ -137,21 +135,21 @@ class Agent:
         if percept in self.sensor:
             self.sensor[percept] = True 
 
-        print(self.location)
         self.kb.add(self.location, self.sensor)
 
-        for sensor_type in self.sensor:
-            self.sensor[sensor_type] = None
+    def reset_sensor(self):
+        for percept in self.sensor:
+            self.sensor[percept] = None
 
     
 
 
 class Knowledge:
     def __init__(self):
-        self.world_info = [[{}] * 4 for _ in range(4)] 
+        self.world_info = [[{} for _ in range(4)] for _ in range(4)]
 
     def add(self, pos, sensors):
-        self.world_info[pos[0]][pos[1]] = sensors
+        self.world_info[pos[0]][pos[1]] = sensors.copy()
         print('pos', pos)
         self.print_world_info()
 
