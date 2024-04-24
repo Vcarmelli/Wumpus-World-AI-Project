@@ -41,9 +41,9 @@ def wumpus_world():
         
         MOUSE_POS = pg.mouse.get_pos()
 
-        btn_ai = Button((570, 270), "Play AI", BLUE, LIGHT_GREEN)
-        btn_reset = Button((570, 390), "Reset Game", BLUE, LIGHT_GREEN)
-        btn_back = Button((570, 480), "Menu", BLUE, LIGHT_GREEN)
+        btn_ai = Button((570, 250), "Play AI", BLUE, LIGHT_GREEN)
+        btn_reset = Button((570, 300), "Reset Game", BLUE, LIGHT_GREEN)
+        btn_back = Button((570, 200), "Menu", BLUE, LIGHT_GREEN)
        
         for button in [btn_ai, btn_reset, btn_back]:
             button.update_color(MOUSE_POS)
@@ -54,9 +54,7 @@ def wumpus_world():
             if event.type == pg.QUIT: sys.exit()
 
             if event.type == pg.MOUSEBUTTONDOWN:
-                pos = event.pos
-                row, col = get_coord(pos)
-
+                
                 if btn_reset.click_button(MOUSE_POS):
                     ww.reset_world()
 
@@ -67,26 +65,32 @@ def wumpus_world():
                 if event.key == pg.K_RIGHT:
                     if ww.cur_col < 3:
                         ww.cur_col += 1
+                        ww.move_agent(ww.cur_row, ww.cur_col)
                 elif event.key == pg.K_LEFT:
                     if ww.cur_col > 0:
                         ww.cur_col -= 1
+                        ww.move_agent(ww.cur_row, ww.cur_col)
                 elif event.key == pg.K_DOWN:
                     if ww.cur_row < 3:
                         ww.cur_row += 1
+                        ww.move_agent(ww.cur_row, ww.cur_col)
                 elif event.key == pg.K_UP:
                     if ww.cur_row > 0:
                         ww.cur_row -= 1
+                        ww.move_agent(ww.cur_row, ww.cur_col)
                                     
-                ww.world[ww.cur_row][ww.cur_col] = 1
+                ww.path[ww.cur_row][ww.cur_col] = 1
+                
 
-        
         for row in range(4):
             for col in range(4):
-                if ww.world[row][col] == 1:
-                    draw.fill_path(row, col, GREEN)
-                draw.fill_path(ww.cur_row, ww.cur_col, AQUA)
+                if ww.path[row][col] == 1:
+                    draw.fill_environment(row, col, ww.world)
+                draw.fill_path(ww.cur_row, ww.cur_col)
+                
 
-        draw.environment(ww.world)
+        #draw.environment(ww.world)
+        
         draw.board()
         pg.display.update()
 

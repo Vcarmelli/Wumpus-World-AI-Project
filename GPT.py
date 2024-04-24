@@ -16,12 +16,15 @@ class WumpusWorldAI:
                     continue
                 inferred[symbol] = False
                 count[symbol] = 0
+                print(inferred)
+                print(symbol)
 
         inferred[goal] = False  # Initialize the goal symbol
 
         agenda = [goal]
         while agenda:
             p = agenda.pop(0)
+            print(p)
             if p == goal:
                 self.propagate(goal, inferred, count, agenda)
                 return inferred[goal]
@@ -42,6 +45,7 @@ class WumpusWorldAI:
                         if count[symbol] == len(clause) - 1 and not inferred[symbol]:
                             inferred[symbol] = True
                             agenda.append(symbol)
+                            print(agenda)
 
     def backward_chaining(self, goal):
         return self.backward_chaining_helper(goal, {})
@@ -54,8 +58,10 @@ class WumpusWorldAI:
             if goal in clause:
                 for symbol in clause:
                     if symbol != goal:
+                        print(goal)
                         if not self.backward_chaining_helper(symbol, inferred):
                             return False
+                        
         inferred[goal] = True
         return True
 

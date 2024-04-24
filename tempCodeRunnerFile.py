@@ -1,3 +1,2 @@
-__main__':
-    ww = WumpusWorld()
-    ww.prepare_environment()
+else:
+                #     print(" " * 45, end="")

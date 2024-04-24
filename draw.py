@@ -27,11 +27,13 @@ class Draw:
             pg.draw.line(self.screen, LIGHT_GREEN, (mg_x + i * space, mg_y), (mg_x + i * space, mg_y + 350), line_width)
             i += 1
 
-    def fill_path(self, row, col, color):
-        x = mg_x + col * space
-        y = mg_y + row * space
-        cell_rect = pg.Rect(x, y, space, space)  # Adjust for line width
-        pg.draw.rect(self.screen, color, cell_rect)
+    def fill_path(self, row, col):
+        x = mg_x + col * space +10
+        y = mg_y + row * space +20
+        
+        agent_img = pg.image.load("assets/agent.png")
+        
+        self.screen.blit(agent_img, (x, y))
 
     def environment(self, world):
         breeze_img = pg.image.load("assets/cell_breeze.png")
