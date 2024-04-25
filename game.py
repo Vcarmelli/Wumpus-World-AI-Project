@@ -100,22 +100,31 @@ class WumpusWorld:
         self.assign_environment(x, y, 'A')
         self.agent.location = (x, y)
         self.perceive_agent(x, y)
-        return
+
 
     def perceive_agent(self, x, y):
         cell = self.world[x][y]
+        perceived = False
         
         if self.check_char(cell, 'B'):
             self.agent.perceive('Breeze')
+            perceived = True
         if self.check_char(cell, 'G'):
             self.agent.perceive('Glitter')
+            perceived = True
         if self.check_char(cell, 'S'):
             self.agent.perceive('Stench')
+            perceived = True
         if not self.is_valid(x, y):
             self.agent.perceive('Bump')
+            perceived = True
+
+        if not perceived:
+            self.agent.perceive('No perceive')
 
         # WUMPUS DIED
         # Perceive scream
+        
 
 
 
@@ -131,19 +140,52 @@ class Agent:
         self.location = (0, 0)
         self.score = 1000
         self.kb = Knowledge()
+        self.inference = [[''] * 4 for _ in range(4)] 
 
 
     def perceive(self, percept):
-        if percept in self.sensor:
+        if percept == "No perceive":
+            self.kb.add(self.location, self.sensor)
+        elif percept in self.sensor:
             self.sensor[percept] = True 
-
+            
         self.kb.add(self.location, self.sensor)
+
 
     def reset_sensor(self):
         for percept in self.sensor:
             self.sensor[percept] = None
 
-    
+    def get_move(self):
+        row, col = self.location[0], self.location[1] 
+        adjacent_cells = [(row, col + 1),
+                          (row, col - 1),
+                          (row + 1, col),
+                          (row - 1, col)]
+        
+        valid_adj_cells = [(x, y) for x, y in adjacent_cells if WumpusWorld.is_valid(self, x, y)]
+        print(valid_adj_cells)
+        for x, y in valid_adj_cells:
+            safety = self.is_move_safe(x, y)
+            if safety == -1:
+                continue
+            else:
+                return x, y
+
+
+    def is_move_safe(self, x, y):
+        #print(self.kb.world_info[x][y])
+        if not self.kb.world_info[x][y]:
+            print('NO KNOWLEDGE')
+            return 0
+        elif all(value is None for value in self.kb.world_info[x][y].values()):
+            print(f'YES ({x}, {y}) SAFE')
+            return 1
+        elif any(value is None for value in self.kb.world_info[x][y].values()):
+            true_values = [key for key, value in self.kb.world_info[x][y].items() if value is True]
+            print(f'THERE IS {true_values} in ({x}, {y})')
+            return -1
+            
 
 
 class Knowledge:
@@ -152,8 +194,8 @@ class Knowledge:
 
     def add(self, pos, sensors):
         self.world_info[pos[0]][pos[1]] = sensors.copy()
-        print('pos', pos)
-        #self.print_world_info()
+        print('pos:', pos)
+        self.print_world_info()
 
 
     def print_world_info(self):
@@ -181,15 +223,13 @@ class Knowledge:
 #     ww.prepare_environment()
 
 #     while True:
-#         coordinate = input("COORDINATE: ")
-#         x, y = int(coordinate[0]), int(coordinate[1])
-
-#         if ww.is_valid(x, y):
-#             ww.move_agent(x, y)
-#             ww.print_world()
-            
-#         else:
-#             print("Invalid coordinates. Please enter valid coordinates.")
+#         x, y = ww.agent.get_move()
+#         print(f"COORDINATE: ({x}, {y})")
+        
+#         ww.move_agent(x, y)
+#         #ww.agent.is_move_safe(x, y)
+#         ww.print_world()
+#         input()
 
 
         

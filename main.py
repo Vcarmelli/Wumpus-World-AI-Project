@@ -61,6 +61,10 @@ def wumpus_world():
                 if btn_back.click_button(MOUSE_POS):
                     main()
 
+                if btn_ai.click_button(MOUSE_POS):
+                    row, col = ww.agent.get_move()
+                    ww.move_agent(ww.cur_row, ww.cur_col)
+
             
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_RIGHT:
