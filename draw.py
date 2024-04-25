@@ -30,8 +30,8 @@ class Draw:
         i = 1
         while (i * space) < 360:
             line_width = 3 
-            pg.draw.line(self.screen, LIGHT_GREEN, (mg_x, mg_y + i * space), (mg_x + 350, mg_y + i * space), line_width)
-            pg.draw.line(self.screen, LIGHT_GREEN, (mg_x + i * space, mg_y), (mg_x + i * space, mg_y + 350), line_width)
+            pg.draw.line(self.screen, LIGHT_GREEN, (mg_x, mg_y + i * space), (mg_x + 355, mg_y + i * space), line_width)
+            pg.draw.line(self.screen, LIGHT_GREEN, (mg_x + i * space, mg_y), (mg_x + i * space, mg_y + 355), line_width)
             i += 1
 
     def agent(self, row, col):

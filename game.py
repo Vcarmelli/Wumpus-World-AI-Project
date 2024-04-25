@@ -270,18 +270,18 @@ class Knowledge:
     
 
 
-if __name__ == '__main__':
-    ww = WumpusWorld()
-    ww.prepare_environment()
+# if __name__ == '__main__':
+#     ww = WumpusWorld()
+#     ww.prepare_environment()
 
-    while True:
-        x, y = ww.agent.get_move()
-        #print(f"COORDINATE: ({x}, {y})")
+#     while True:
+#         x, y = ww.agent.get_move()
+#         #print(f"COORDINATE: ({x}, {y})")
         
-        ww.move_agent(x, y)
-        #ww.agent.is_move_safe(x, y)
-        ww.print_world()
-        input()
+#         ww.move_agent(x, y)
+#         #ww.agent.is_move_safe(x, y)
+#         ww.print_world()
+#         input()
 
 
         
