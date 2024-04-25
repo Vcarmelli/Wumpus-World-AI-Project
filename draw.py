@@ -15,6 +15,13 @@ WORLD_SIZE = 4
 class Draw:
     def __init__(self, screen):
         self.screen = screen
+        self.agent_img = pg.image.load("assets/agent.png")
+        self.breeze_img = pg.image.load("assets/cell_breeze.png")
+        self.breeze_stench_img = pg.image.load("assets/cell_breeze-stench.png")
+        self.gold_img = pg.image.load("assets/cell_gold.png")
+        self.pit_img = pg.image.load("assets/cell_pit.png")
+        self.stench_img = pg.image.load("assets/cell_stench.png")
+        self.wumpus_img = pg.image.load("assets/cell_wumpus.png")
         
 
     def board(self):
@@ -27,21 +34,13 @@ class Draw:
             pg.draw.line(self.screen, LIGHT_GREEN, (mg_x + i * space, mg_y), (mg_x + i * space, mg_y + 350), line_width)
             i += 1
 
-    def fill_path(self, row, col):
+    def agent(self, row, col):
         x = mg_x + col * space +10
         y = mg_y + row * space +20
         
-        agent_img = pg.image.load("assets/agent.png")
-        
-        self.screen.blit(agent_img, (x, y))
+        self.screen.blit(self.agent_img, (x, y))
 
     def environment(self, world):
-        breeze_img = pg.image.load("assets/cell_breeze.png")
-        breeze_stench_img = pg.image.load("assets/cell_breeze-stench.png")
-        gold_img = pg.image.load("assets/cell_gold.png")
-        pit_img = pg.image.load("assets/cell_pit.png")
-        stench_img = pg.image.load("assets/cell_stench.png")
-        wumpus_img = pg.image.load("assets/cell_wumpus.png")
 
         for row in range(WORLD_SIZE):
             for col in range(WORLD_SIZE):
@@ -51,43 +50,53 @@ class Draw:
                 y = mg_y + row * space
 
                 if cell_type == 'B':
-                    self.screen.blit(breeze_img, (x, y))
+                    self.screen.blit(self.breeze_img, (x, y))
                 elif cell_type == 'BS':
-                    self.screen.blit(breeze_stench_img, (x, y))
+                    self.screen.blit(self.breeze_stench_img, (x, y))
                 elif cell_type == 'G' or cell_type == 'BG'  or cell_type == 'GS' or cell_type == 'BGS':
-                    self.screen.blit(gold_img, (x, y))
+                    self.screen.blit(self.gold_img, (x, y))
                 elif cell_type == 'P' or cell_type == 'BP' or cell_type == 'PS' or cell_type == 'BPS':
-                    self.screen.blit(pit_img, (x, y))
+                    self.screen.blit(self.pit_img, (x, y))
                 elif cell_type == 'S':
-                    self.screen.blit(stench_img, (x, y))
+                    self.screen.blit(self.stench_img, (x, y))
                 elif cell_type == 'W' or cell_type == 'BW':
-                    self.screen.blit(wumpus_img, (x, y))
+                    self.screen.blit(self.wumpus_img, (x, y))
 
-    def fill_environment(self, row, col, world):
-        breeze_img = pg.image.load("assets/cell_breeze.png")
-        breeze_stench_img = pg.image.load("assets/cell_breeze-stench.png")
-        gold_img = pg.image.load("assets/cell_gold.png")
-        pit_img = pg.image.load("assets/cell_pit.png")
-        stench_img = pg.image.load("assets/cell_stench.png")
-        wumpus_img = pg.image.load("assets/cell_wumpus.png")
-
+    def fill_env(self, row, col, world):
         cell_type = world[row][col]
 
         x = mg_x + col * space
         y = mg_y + row * space
 
-        if cell_type == 'B':
-            self.screen.blit(breeze_img, (x, y))
+        if len(cell_type) > 1 and cell_type[0] == 'A':
+            if len(cell_type) == 3 and cell_type[1] == 'B' and cell_type[2] == 'S':
+                self.screen.blit(self.breeze_stench_img, (x, y))
+            elif len(cell_type) == 2 and cell_type[1] == 'B':
+                self.screen.blit(self.breeze_img, (x, y))
+            elif len(cell_type) == 2 and cell_type[1] == 'S':
+                self.screen.blit(self.stench_img, (x, y))
+            self.screen.blit(self.agent_img, (x+10, y+20))
+        elif cell_type == '':
+            cell_rect = pg.Rect(x, y, space, space)
+            pg.draw.rect(self.screen, BLUE, cell_rect)
+        elif cell_type == 'B':
+            self.screen.blit(self.breeze_img, (x, y))
         elif cell_type == 'BS':
-            self.screen.blit(breeze_stench_img, (x, y))
+            self.screen.blit(self.breeze_stench_img, (x, y))
         elif cell_type == 'G' or cell_type == 'BG'  or cell_type == 'GS' or cell_type == 'BGS':
-            self.screen.blit(gold_img, (x, y))
+            self.screen.blit(self.gold_img, (x, y))
         elif cell_type == 'P' or cell_type == 'BP' or cell_type == 'PS' or cell_type == 'BPS':
-            self.screen.blit(pit_img, (x, y))
+            self.screen.blit(self.pit_img, (x, y))
         elif cell_type == 'S':
-            self.screen.blit(stench_img, (x, y))
+            self.screen.blit(self.stench_img, (x, y))
         elif cell_type == 'W' or cell_type == 'BW':
-            self.screen.blit(wumpus_img, (x, y))
+            self.screen.blit(self.wumpus_img, (x, y))
+
+        if cell_type == 'A':
+            cell_rect = pg.Rect(x, y, space, space)
+            pg.draw.rect(self.screen, BLUE, cell_rect)
+            self.screen.blit(self.agent_img, (x+10, y+20))
+
                     
 
         

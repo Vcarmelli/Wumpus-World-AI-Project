@@ -61,35 +61,38 @@ def wumpus_world():
                 if btn_back.click_button(MOUSE_POS):
                     main()
 
+            
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_RIGHT:
                     if ww.cur_col < 3:
                         ww.cur_col += 1
+                        draw.fill_env(ww.cur_row, ww.cur_col, ww.world)  
                         ww.move_agent(ww.cur_row, ww.cur_col)
                 elif event.key == pg.K_LEFT:
                     if ww.cur_col > 0:
                         ww.cur_col -= 1
+                        draw.fill_env(ww.cur_row, ww.cur_col, ww.world)   
                         ww.move_agent(ww.cur_row, ww.cur_col)
                 elif event.key == pg.K_DOWN:
                     if ww.cur_row < 3:
                         ww.cur_row += 1
+                        draw.fill_env(ww.cur_row, ww.cur_col, ww.world)  
                         ww.move_agent(ww.cur_row, ww.cur_col)
                 elif event.key == pg.K_UP:
                     if ww.cur_row > 0:
                         ww.cur_row -= 1
+                        draw.fill_env(ww.cur_row, ww.cur_col, ww.world)   
                         ww.move_agent(ww.cur_row, ww.cur_col)
-                                    
-                ww.path[ww.cur_row][ww.cur_col] = 1
-                
+   
+                #draw.agent(ww.cur_row, ww.cur_col)  
+                ww.path[ww.cur_row][ww.cur_col] = 1     
 
-        for row in range(4):
-            for col in range(4):
-                if ww.path[row][col] == 1:
-                    draw.fill_environment(row, col, ww.world)
-                draw.fill_path(ww.cur_row, ww.cur_col)
-                
-
-        #draw.environment(ww.world)
+            for row in range(4):
+                for col in range(4):
+                    if ww.path[row][col]:
+                        draw.fill_env(row, col, ww.world)
+                    
+                     
         
         draw.board()
         pg.display.update()

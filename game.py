@@ -5,6 +5,7 @@ WORLD_SIZE = 4
 class WumpusWorld:
     def __init__(self):
         self.path = [[0] * 4 for _ in range(4)] 
+        self.path[0][0] = 1
         self.world = [[''] * 4 for _ in range(4)] 
         self.world[0][0] = 'A'
         self.cur_row = 0
@@ -15,6 +16,7 @@ class WumpusWorld:
         self.cur_row = 0
         self.cur_col = 0
         self.path = [[0] * 4 for _ in range(4)] 
+        self.path[0][0] = 1
         self.world = [[''] * 4 for _ in range(4)] 
         self.world[0][0] = 'A'
 
@@ -57,7 +59,6 @@ class WumpusWorld:
                 current_chars.remove(character)
                 self.world[x][y] = ''.join(sorted(current_chars))
         else:
-            # Handle coordinates out of bounds
             pass      
 
     def check_char(self, cell, letter):
@@ -103,6 +104,7 @@ class WumpusWorld:
 
     def perceive_agent(self, x, y):
         cell = self.world[x][y]
+        
         if self.check_char(cell, 'B'):
             self.agent.perceive('Breeze')
         if self.check_char(cell, 'G'):
@@ -151,7 +153,7 @@ class Knowledge:
     def add(self, pos, sensors):
         self.world_info[pos[0]][pos[1]] = sensors.copy()
         print('pos', pos)
-        self.print_world_info()
+        #self.print_world_info()
 
 
     def print_world_info(self):
