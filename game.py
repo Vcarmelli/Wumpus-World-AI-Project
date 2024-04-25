@@ -141,6 +141,8 @@ class Agent:
         self.score = 1000
         self.kb = Knowledge()
         self.inference = [[''] * 4 for _ in range(4)] 
+        self.prev_moves = [] 
+        self.count_loop = 0
 
 
     def perceive(self, percept):
@@ -163,14 +165,34 @@ class Agent:
                           (row + 1, col),
                           (row - 1, col)]
         
-        valid_adj_cells = [(x, y) for x, y in adjacent_cells if WumpusWorld.is_valid(self, x, y)]
+        valid_adj_cells = [(x, y) for x, y in adjacent_cells if WumpusWorld.is_valid(self, x, y)]        
+        random.shuffle(valid_adj_cells)
         print(valid_adj_cells)
         for x, y in valid_adj_cells:
             safety = self.is_move_safe(x, y)
             if safety == -1:
                 continue
             else:
+                for i in range(len(self.prev_moves) - 2):
+                    if (x, y) == self.prev_moves[i]:
+                        print(i)
+                        print("Current move is the same as a move made two steps ago.")
+                        self.count_loop += 1
+                        print("self.count_loop", self.count_loop)
+                
+                    if self.count_loop == 3:
+                        self.prev_moves = []
+                        self.count_loop = 0
+                        valid_adj_cells.remove((x, y))
+                        return random.choice(valid_adj_cells)
+                        
+                print("Current move:", (x, y))
+                print("Previous moves:", self.prev_moves)
+                
+                self.prev_moves.append((x, y))
                 return x, y
+            
+        return random.choice(valid_adj_cells)
 
 
     def is_move_safe(self, x, y):
