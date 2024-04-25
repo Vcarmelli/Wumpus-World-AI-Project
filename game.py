@@ -152,20 +152,21 @@ class Agent:
             self.sensor[percept] = True 
             
         self.kb.add(self.location, self.sensor)
+        self.infer()
 
 
     def reset_sensor(self):
         for percept in self.sensor:
             self.sensor[percept] = None
 
+    def get_adjacent(self, x, y):
+        return [(x, y + 1), (x, y - 1), (x + 1, y), (x - 1, y)]
+
     def get_move(self):
         row, col = self.location[0], self.location[1] 
-        adjacent_cells = [(row, col + 1),
-                          (row, col - 1),
-                          (row + 1, col),
-                          (row - 1, col)]
+        adj_cells = self.get_adjacent(row, col)
         
-        valid_adj_cells = [(x, y) for x, y in adjacent_cells if WumpusWorld.is_valid(self, x, y)]        
+        valid_adj_cells = [(x, y) for x, y in adj_cells if WumpusWorld.is_valid(self, x, y)]        
         random.shuffle(valid_adj_cells)
         print(valid_adj_cells)
         for x, y in valid_adj_cells:
@@ -194,7 +195,6 @@ class Agent:
             
         return random.choice(valid_adj_cells)
 
-
     def is_move_safe(self, x, y):
         #print(self.kb.world_info[x][y])
         if not self.kb.world_info[x][y]:
@@ -207,7 +207,37 @@ class Agent:
             true_values = [key for key, value in self.kb.world_info[x][y].items() if value is True]
             print(f'THERE IS {true_values} in ({x}, {y})')
             return -1
+        
+    def infer(self):
+        row, col = self.location[0], self.location[1] 
+        adjacent_cells = self.get_adjacent(row, col)
+        predict = { 'Stench': 'W', 'Breeze': 'P', 'Glitter': 'G'}
+
+        for key, value in self.kb.world_info[row][col].items():
+            if value == True:
+                for adj_row, adj_col in adjacent_cells:
+                    if WumpusWorld.is_valid(self, adj_row, adj_col):
+                        prediction = predict.get(key)
+                        if key == "Glitter":
+                            self.assign_inference(row, col, prediction)
+                        else:
+                            self.assign_inference(adj_row, adj_col, prediction)
+
+        for i in range(4):
+            print("|  ", end="")
+            for j in range(4):
+                print(self.inference[i][j], end="  ")
+                print("|  ", end="")
+            print()
             
+    def assign_inference(self, x, y, character):
+        if WumpusWorld.is_valid(self, x, y):
+            current_chars = set(self.inference[x][y])
+            current_chars.add(character)
+            self.inference[x][y] = ''.join(sorted(current_chars))
+        else:
+            #print("Error: Coordinates out of bounds!")
+            pass
 
 
 class Knowledge:
@@ -240,18 +270,18 @@ class Knowledge:
     
 
 
-# if __name__ == '__main__':
-#     ww = WumpusWorld()
-#     ww.prepare_environment()
+if __name__ == '__main__':
+    ww = WumpusWorld()
+    ww.prepare_environment()
 
-#     while True:
-#         x, y = ww.agent.get_move()
-#         print(f"COORDINATE: ({x}, {y})")
+    while True:
+        x, y = ww.agent.get_move()
+        #print(f"COORDINATE: ({x}, {y})")
         
-#         ww.move_agent(x, y)
-#         #ww.agent.is_move_safe(x, y)
-#         ww.print_world()
-#         input()
+        ww.move_agent(x, y)
+        #ww.agent.is_move_safe(x, y)
+        ww.print_world()
+        input()
 
 
         
