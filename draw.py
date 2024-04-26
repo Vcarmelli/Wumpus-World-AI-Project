@@ -1,7 +1,7 @@
 import pygame as pg
 
 space = 90
-mg_x = 90
+mg_x = 70
 mg_y = 150
 WORLD_SIZE = 4
 
@@ -41,6 +41,7 @@ class Draw:
         y = mg_y + row * space +20
         
         self.screen.blit(self.agent_img, (x, y))
+        self.board()
 
     def environment(self, world):
         for row in range(WORLD_SIZE):
@@ -85,9 +86,11 @@ class Draw:
 
 
     def status(self, text, color):
-        text_bg = pg.Surface((240, 100))
+        text_bg = pg.Surface((240, 90))
         text_bg.fill(BLUE)
-        bg_rect = text_bg.get_rect(center=(610, 340))
+        bg_rect = text_bg.get_rect(center=(610, 350))
+        pg.draw.rect(self.screen, AQUA, pg.Rect(bg_rect.left-2, bg_rect.top-2, 244, 94), 2)
+
 
         if len(text) <= 16:
             output = self.font.render(text, True, color)
@@ -107,6 +110,21 @@ class Draw:
             self.screen.blit(text_bg, bg_rect)
             self.screen.blit(output1, text_rect1)
             self.screen.blit(output2, text_rect2)
+
+    def score(self, text, color):
+        text_bg = pg.Surface((115, 60))
+        text_bg.fill(LIGHT_GREEN)
+        bg_rect = text_bg.get_rect(center=((680, 180)))
+
+        output = self.font.render("Score", True, color)
+        score = self.font.render(text, True, color)
+        text_rect1 = score.get_rect(center=(bg_rect.centerx, bg_rect.centery + 10))
+        text_rect2 = output.get_rect(center=(bg_rect.centerx, bg_rect.centery - 10))
+
+        self.screen.blit(text_bg, bg_rect)
+        self.screen.blit(score, text_rect1)
+        self.screen.blit(output, text_rect2)
+
 
 
         

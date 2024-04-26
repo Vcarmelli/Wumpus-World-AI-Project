@@ -54,7 +54,7 @@ def over():
                         main()
 
         draw.board()
-        pg.display.update()
+        pg.display.flip()
 
 def wumpus_world():
     pg.event.clear()
@@ -82,6 +82,7 @@ def wumpus_world():
             draw.status("Game is ongoing!", LIGHT_GREEN)            
         elif stats == 0:
             draw.status(" You found the  golden treasure!", WHITE) 
+            pg.display.update()
         elif stats == 1:
             draw.status(" Game over. You met the Wumpus!", WHITE) 
             draw.environment(ww.world)
@@ -90,6 +91,7 @@ def wumpus_world():
             draw.status(" Game over. You fall into the pit!", WHITE) 
             draw.environment(ww.world)
             over()
+            
             
         for event in pg.event.get():
             
@@ -104,23 +106,25 @@ def wumpus_world():
                     main()
 
                 if btn_ai.click_button(MOUSE_POS):
-                    while ww.game_status() <= 0:
-                        pg.time.delay(500)
+                    while ww.game_status() < 1:
+                        
                         ww.cur_row, ww.cur_col = ww.agent.get_move()
                         draw.fill_env(ww.cur_row, ww.cur_col, ww.world)  
                         ww.move_agent(ww.cur_row, ww.cur_col)
                         ww.path[ww.cur_row][ww.cur_col] = 1     
-                    
-                        draw.status("Game is not over", LIGHT_GREEN) 
-                        draw.agent(ww.cur_row, ww.cur_col)  
 
+                        pg.time.delay(500)
+                        draw.agent(ww.cur_row, ww.cur_col)  
+                        draw.score(f"{ww.agent.score}", GREEN)
                         for row in range(4):
                             for col in range(4):
                                 if ww.path[row][col]:
                                     draw.fill_env(row, col, ww.world)
                                 draw.agent(ww.cur_row, ww.cur_col)  
-
-                        draw.board()
+                                
+                        
+                        if event.type == pg.MOUSEBUTTONDOWN:
+                            pass
                         pg.display.update()
                         
             
@@ -149,10 +153,13 @@ def wumpus_world():
                 
             #     ww.path[ww.cur_row][ww.cur_col] = 1     
 
-        
+        draw.score(f"{ww.agent.score}", GREEN)
+        draw.status("Click the 'Play AI' button!", WHITE)          
+        draw.agent(ww.cur_row, ww.cur_col)  
                 
         draw.board()
-        pg.display.update()
+        pg.display.flip()
+
 
 def description():
     game_bg = pg.image.load("assets/description-bg.png")
@@ -176,7 +183,7 @@ def description():
                 if btn_back.click_button(MOUSE_POS):
                     main()
         
-        pg.display.update()
+        pg.display.flip()
 
 
 
@@ -207,7 +214,7 @@ def main():
                 if controls.click_button(MOUSE_POS):
                     description()
 
-        pg.display.update()
+        pg.display.flip()
     
     
 

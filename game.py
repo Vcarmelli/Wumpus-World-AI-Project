@@ -70,9 +70,8 @@ class WumpusWorld:
         self.agent.reset_sensor()
         self.locate_agent()
         self.world = func.assign_char(x, y, 'A', self.world)
-        print('ASSIGN A')
         self.perceive_agent(x, y)
-            
+        self.agent.score -= 1
 
 
     def perceive_agent(self, x, y):
@@ -204,7 +203,6 @@ class Agent:
                             self.inference = func.assign_char(adj_row, adj_col, prediction, self.inference)
 
         func.print_world(self.inference)
-
             
 
 
