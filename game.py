@@ -67,15 +67,12 @@ class WumpusWorld:
     def move_agent(self, x, y):
         self.agent.location = (x, y)
 
-        if self.game_over():
-            return False
-        else:
-            self.agent.reset_sensor()
-            self.locate_agent()
-            self.world = func.assign_char(x, y, 'A', self.world)
-            print('ASSIGN A')
-            self.perceive_agent(x, y)
-            return True
+        self.agent.reset_sensor()
+        self.locate_agent()
+        self.world = func.assign_char(x, y, 'A', self.world)
+        print('ASSIGN A')
+        self.perceive_agent(x, y)
+            
 
 
     def perceive_agent(self, x, y):
@@ -102,15 +99,15 @@ class WumpusWorld:
         # Perceive scream
         
 
-    def game_over(self):
+    def game_status(self):
         #print(self.g_w_p_coords[1:])
-        for pos in self.g_w_p_coords[1:]:
+        for i, pos in enumerate(self.g_w_p_coords):
             if self.agent.location == pos:
                 # print("self.agent.location:", self.agent.location)
                 # print("pos:", pos)
-                print("GAME OVER")
-                return True
-        return False
+                #print("GAME OVER")
+                return i
+        return -1
 
 
 class Agent:

@@ -24,7 +24,7 @@ class Draw:
         self.stench_img = pg.image.load("assets/cell_stench.png")
         self.wumpus_img = pg.image.load("assets/cell_wumpus.png")
 
-        self.font = pg.font.SysFont('Arial Black', 23)
+        self.font = pg.font.SysFont('Arial Black', 20)
 
     def board(self):
         pg.draw.rect(self.screen, LIGHT_GREEN, pg.Rect(mg_x, mg_y, 360, 360), 7)
@@ -87,14 +87,31 @@ class Draw:
     def status(self, text, color):
         text_bg = pg.Surface((240, 100))
         text_bg.fill(BLUE)
-
-        output = self.font.render(text, True, color)
-
         bg_rect = text_bg.get_rect(center=(610, 340))
-        text_rect = output.get_rect(center=bg_rect.center)
 
-        self.screen.blit(text_bg, bg_rect)
-        self.screen.blit(output, text_rect)
+        if len(text) <= 16:
+            output = self.font.render(text, True, color)
+            text_rect = output.get_rect(center=bg_rect.center)
+
+            self.screen.blit(text_bg, bg_rect)
+            self.screen.blit(output, text_rect)
+        else:
+            text_line1 = text[:16]
+            text_line2 = text[16:]
+            output1 = self.font.render(text_line1, True, color)
+            output2 = self.font.render(text_line2, True, color)
+
+            text_rect1 = output1.get_rect(center=(bg_rect.centerx, bg_rect.centery - 15))
+            text_rect2 = output2.get_rect(center=(bg_rect.centerx, bg_rect.centery + 15))
+
+            self.screen.blit(text_bg, bg_rect)
+            self.screen.blit(output1, text_rect1)
+            self.screen.blit(output2, text_rect2)
+
+
+        
+
+        
 
 
                     

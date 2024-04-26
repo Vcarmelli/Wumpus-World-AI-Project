@@ -1,2 +1,3 @@
-
-        # Get the rect of the background surface and set its center
+raw.status("Game is over", WHITE) 
+            draw.environment(ww.world)
+            over()

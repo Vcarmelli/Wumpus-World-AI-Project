@@ -29,15 +29,42 @@ def get_coord(pos):
     y = pos[1]//dif
     return [y, x]
 
+def over():
+    draw = Draw(screen)
+
+    while True:
+        
+        MOUSE_POS = pg.mouse.get_pos()
+        btn_reset = Button((550, 250), " Reset ", GREEN, LIGHT_GREEN)
+        btn_back = Button((680, 250), " Menu ", GREEN, LIGHT_GREEN)
+
+        for button in [btn_reset, btn_back]:
+            button.update_color(MOUSE_POS)
+            button.draw_button(screen)
+
+        for event in pg.event.get():
+            
+            if event.type == pg.QUIT: sys.exit()
+            if event.type == pg.MOUSEBUTTONDOWN:
+                    
+                    if btn_reset.click_button(MOUSE_POS):
+                        wumpus_world()
+
+                    if btn_back.click_button(MOUSE_POS):
+                        main()
+
+        draw.board()
+        pg.display.update()
+
 def wumpus_world():
-    ingame = False
+    pg.event.clear()
+
     draw = Draw(screen)
     ww = WumpusWorld()
+    ww.prepare_environment()
     
     game_bg = pg.image.load("assets/game-bg.png")
-    screen.blit(game_bg, (0,0))
-    
-    ww.prepare_environment()
+    screen.blit(game_bg, (0,0))    
     while True:
         
         MOUSE_POS = pg.mouse.get_pos()
@@ -50,6 +77,20 @@ def wumpus_world():
             button.update_color(MOUSE_POS)
             button.draw_button(screen)
 
+        stats = ww.game_status()
+        if stats == -1:
+            draw.status("Game is ongoing!", LIGHT_GREEN)            
+        elif stats == 0:
+            draw.status(" You found the  golden treasure!", WHITE) 
+        elif stats == 1:
+            draw.status(" Game over. You met the Wumpus!", WHITE) 
+            draw.environment(ww.world)
+            over()
+        elif 2 <= stats < 5:
+            draw.status(" Game over. You fall into the pit!", WHITE) 
+            draw.environment(ww.world)
+            over()
+            
         for event in pg.event.get():
             
             if event.type == pg.QUIT: sys.exit()
@@ -63,50 +104,52 @@ def wumpus_world():
                     main()
 
                 if btn_ai.click_button(MOUSE_POS):
-                    ww.cur_row, ww.cur_col = ww.agent.get_move()
-                    draw.fill_env(ww.cur_row, ww.cur_col, ww.world)  
-                    ingame = ww.move_agent(ww.cur_row, ww.cur_col)
-                    ww.path[ww.cur_row][ww.cur_col] = 1     
+                    while ww.game_status() <= 0:
+                        pg.time.delay(500)
+                        ww.cur_row, ww.cur_col = ww.agent.get_move()
+                        draw.fill_env(ww.cur_row, ww.cur_col, ww.world)  
+                        ww.move_agent(ww.cur_row, ww.cur_col)
+                        ww.path[ww.cur_row][ww.cur_col] = 1     
                     
-                    if ingame:
                         draw.status("Game is not over", LIGHT_GREEN) 
                         draw.agent(ww.cur_row, ww.cur_col)  
-                    else:
-                        draw.status("Game is over", WHITE) 
-                        draw.environment(ww.world)
 
+                        for row in range(4):
+                            for col in range(4):
+                                if ww.path[row][col]:
+                                    draw.fill_env(row, col, ww.world)
+                                draw.agent(ww.cur_row, ww.cur_col)  
+
+                        draw.board()
+                        pg.display.update()
+                        
             
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_RIGHT:
-                    if ww.cur_col < 3:
-                        ww.cur_col += 1
-                        draw.fill_env(ww.cur_row, ww.cur_col, ww.world)  
-                        ww.move_agent(ww.cur_row, ww.cur_col)
-                elif event.key == pg.K_LEFT:
-                    if ww.cur_col > 0:
-                        ww.cur_col -= 1
-                        draw.fill_env(ww.cur_row, ww.cur_col, ww.world)   
-                        ww.move_agent(ww.cur_row, ww.cur_col)
-                elif event.key == pg.K_DOWN:
-                    if ww.cur_row < 3:
-                        ww.cur_row += 1
-                        draw.fill_env(ww.cur_row, ww.cur_col, ww.world)  
-                        ww.move_agent(ww.cur_row, ww.cur_col)
-                elif event.key == pg.K_UP:
-                    if ww.cur_row > 0:
-                        ww.cur_row -= 1
-                        draw.fill_env(ww.cur_row, ww.cur_col, ww.world)   
-                        ww.move_agent(ww.cur_row, ww.cur_col)
+            # if event.type == pg.KEYDOWN:
+            #     if event.key == pg.K_RIGHT:
+            #         if ww.cur_col < 3:
+            #             ww.cur_col += 1
+            #             draw.fill_env(ww.cur_row, ww.cur_col, ww.world)  
+            #             ww.move_agent(ww.cur_row, ww.cur_col)
+            #     elif event.key == pg.K_LEFT:
+            #         if ww.cur_col > 0:
+            #             ww.cur_col -= 1
+            #             draw.fill_env(ww.cur_row, ww.cur_col, ww.world)   
+            #             ww.move_agent(ww.cur_row, ww.cur_col)
+            #     elif event.key == pg.K_DOWN:
+            #         if ww.cur_row < 3:
+            #             ww.cur_row += 1
+            #             draw.fill_env(ww.cur_row, ww.cur_col, ww.world)  
+            #             ww.move_agent(ww.cur_row, ww.cur_col)
+            #     elif event.key == pg.K_UP:
+            #         if ww.cur_row > 0:
+            #             ww.cur_row -= 1
+            #             draw.fill_env(ww.cur_row, ww.cur_col, ww.world)   
+            #             ww.move_agent(ww.cur_row, ww.cur_col)
    
                 
-                ww.path[ww.cur_row][ww.cur_col] = 1     
+            #     ww.path[ww.cur_row][ww.cur_col] = 1     
 
-            for row in range(4):
-                for col in range(4):
-                    if ww.path[row][col]:
-                        draw.fill_env(row, col, ww.world)
-                    draw.agent(ww.cur_row, ww.cur_col)  
-
+        
                 
         draw.board()
         pg.display.update()
