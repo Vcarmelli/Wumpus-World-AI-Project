@@ -30,6 +30,7 @@ def get_coord(pos):
     return [y, x]
 
 def wumpus_world():
+    ingame = False
     draw = Draw(screen)
     ww = WumpusWorld()
     
@@ -41,9 +42,9 @@ def wumpus_world():
         
         MOUSE_POS = pg.mouse.get_pos()
 
-        btn_ai = Button((570, 230), "Play AI", BLUE, LIGHT_GREEN)
-        btn_reset = Button((570, 300), "Reset Game", BLUE, LIGHT_GREEN)
-        btn_back = Button((570, 370), "Menu", BLUE, LIGHT_GREEN)
+        btn_ai = Button((550, 180), "Play AI", GREEN, LIGHT_GREEN)
+        btn_reset = Button((550, 250), " Reset ", GREEN, LIGHT_GREEN)
+        btn_back = Button((680, 250), " Menu ", GREEN, LIGHT_GREEN)
        
         for button in [btn_ai, btn_reset, btn_back]:
             button.update_color(MOUSE_POS)
@@ -64,9 +65,15 @@ def wumpus_world():
                 if btn_ai.click_button(MOUSE_POS):
                     ww.cur_row, ww.cur_col = ww.agent.get_move()
                     draw.fill_env(ww.cur_row, ww.cur_col, ww.world)  
-                    ww.move_agent(ww.cur_row, ww.cur_col)
+                    ingame = ww.move_agent(ww.cur_row, ww.cur_col)
                     ww.path[ww.cur_row][ww.cur_col] = 1     
-                    draw.agent(ww.cur_row, ww.cur_col)  
+                    
+                    if ingame:
+                        draw.status("Game is not over", LIGHT_GREEN) 
+                        draw.agent(ww.cur_row, ww.cur_col)  
+                    else:
+                        draw.status("Game is over", WHITE) 
+                        draw.environment(ww.world)
 
             
             if event.type == pg.KEYDOWN:
@@ -99,7 +106,8 @@ def wumpus_world():
                     if ww.path[row][col]:
                         draw.fill_env(row, col, ww.world)
                     draw.agent(ww.cur_row, ww.cur_col)  
-                    
+
+                
         draw.board()
         pg.display.update()
 
@@ -138,7 +146,7 @@ def main():
         MOUSE_POS = pg.mouse.get_pos()
 
         start = Button((370, 480), "Start Game", BLUE, LIGHT_GREEN)
-        controls = Button((485, 480), "?", BLUE, LIGHT_GREEN)
+        controls = Button((485, 480), " ? ", BLUE, LIGHT_GREEN)
        
         for button in [start, controls]:
             button.update_color(MOUSE_POS)

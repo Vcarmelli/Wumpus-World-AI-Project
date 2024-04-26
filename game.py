@@ -68,13 +68,14 @@ class WumpusWorld:
         self.agent.location = (x, y)
 
         if self.game_over():
-            sys.exit()
+            return False
         else:
             self.agent.reset_sensor()
             self.locate_agent()
             self.world = func.assign_char(x, y, 'A', self.world)
             print('ASSIGN A')
             self.perceive_agent(x, y)
+            return True
 
 
     def perceive_agent(self, x, y):
@@ -240,18 +241,18 @@ class Knowledge:
     
 
 
-if __name__ == '__main__':
-    ww = WumpusWorld()
-    ww.prepare_environment()
+# if __name__ == '__main__':
+#     ww = WumpusWorld()
+#     ww.prepare_environment()
 
-    while True:
-        x, y = ww.agent.get_move()
-        #print(f"COORDINATE: ({x}, {y})")
+#     while True:
+#         x, y = ww.agent.get_move()
+#         #print(f"COORDINATE: ({x}, {y})")
         
-        ww.move_agent(x, y)
-        #ww.agent.is_move_safe(x, y)
-        func.print_world(ww.world)
-        input()
+#         ww.move_agent(x, y)
+#         #ww.agent.is_move_safe(x, y)
+#         func.print_world(ww.world)
+#         input()
 
 
         

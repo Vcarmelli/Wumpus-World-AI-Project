@@ -43,26 +43,10 @@ class Draw:
         self.screen.blit(self.agent_img, (x, y))
 
     def environment(self, world):
-
         for row in range(WORLD_SIZE):
             for col in range(WORLD_SIZE):
-                cell_type = world[row][col]
-
-                x = mg_x + col * space
-                y = mg_y + row * space
-
-                if cell_type == 'B':
-                    self.screen.blit(self.breeze_img, (x, y))
-                elif cell_type == 'BS':
-                    self.screen.blit(self.breeze_stench_img, (x, y))
-                elif cell_type == 'G' or cell_type == 'BG'  or cell_type == 'GS' or cell_type == 'BGS':
-                    self.screen.blit(self.gold_img, (x, y))
-                elif cell_type == 'P' or cell_type == 'BP' or cell_type == 'PS' or cell_type == 'BPS':
-                    self.screen.blit(self.pit_img, (x, y))
-                elif cell_type == 'S':
-                    self.screen.blit(self.stench_img, (x, y))
-                elif cell_type == 'W' or cell_type == 'BW':
-                    self.screen.blit(self.wumpus_img, (x, y))
+                self.fill_env(row, col, world)
+                
 
     def fill_env(self, row, col, world):
         cell_type = world[row][col]
@@ -100,11 +84,18 @@ class Draw:
         #     self.screen.blit(self.agent_img, (x+10, y+20))
 
 
-    def status(self, text):
+    def status(self, text, color):
+        text_bg = pg.Surface((240, 100))
+        text_bg.fill(BLUE)
 
-        
-        text1 = self.font.render(text, True, GREEN)
-        self.screen.blit(text1, (405, 230))	
+        output = self.font.render(text, True, color)
+
+        bg_rect = text_bg.get_rect(center=(610, 340))
+        text_rect = output.get_rect(center=bg_rect.center)
+
+        self.screen.blit(text_bg, bg_rect)
+        self.screen.blit(output, text_rect)
+
 
                     
 
