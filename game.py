@@ -1,6 +1,9 @@
 import random
+from helper import Helper
+import sys
 
 WORLD_SIZE = 4
+func = Helper()
 
 class WumpusWorld:
     def __init__(self):
@@ -20,15 +23,6 @@ class WumpusWorld:
         self.world = [[''] * 4 for _ in range(4)] 
         self.world[0][0] = 'A'
 
-    def print_world(self):    
-        print("+" + "-" * 23 + "+")
-        for i in range(4):
-            print("|  ", end="")
-            for j in range(4):
-                print(self.world[i][j], end="  ")
-                print("|  ", end="")
-            print()
-            print("+" + "-" * 23 + "+")
 
     def random_gold_wumpus_pits(self):
         coordinates = set()  # Use a set to ensure uniqueness
@@ -40,82 +34,63 @@ class WumpusWorld:
             coordinates.add((x, y))
         return list(coordinates)
     
-    def is_valid(self, x, y):
-        return 0 <= x < WORLD_SIZE and 0 <= y < WORLD_SIZE
-    
-    def assign_environment(self, x, y, character):
-        if self.is_valid(x, y):
-            current_chars = set(self.world[x][y])
-            current_chars.add(character)
-            self.world[x][y] = ''.join(sorted(current_chars))
-        else:
-            #print("Error: Coordinates out of bounds!")
-            pass
-
-    def remove_char(self, x, y, character):
-        if self.is_valid(x, y):
-            current_chars = set(self.world[x][y])
-            if character in current_chars:
-                current_chars.remove(character)
-                self.world[x][y] = ''.join(sorted(current_chars))
-        else:
-            pass      
-
-    def check_char(self, cell, letter):
-        return any(letter in string for string in cell)
 
     def add_stench_breeze(self):
         w_b = { 'W': 'S', 'P': 'B'}
         for x in range(WORLD_SIZE):
             for y in range(WORLD_SIZE):
                 for key, adj in w_b.items():
-                    if self.check_char([self.world[x][y]], key):
-                        self.assign_environment(x, y+1, adj)
-                        self.assign_environment(x, y-1, adj)
-                        self.assign_environment(x+1, y, adj)
-                        self.assign_environment(x-1, y, adj)
+                    if func.check_char([self.world[x][y]], key):
+                        self.world = func.assign_char(x, y+1, adj, self.world)
+                        self.world = func.assign_char(x, y-1, adj, self.world)
+                        self.world = func.assign_char(x+1, y, adj, self.world)
+                        self.world = func.assign_char(x-1, y, adj, self.world)
 
 
     def prepare_environment(self):
-        g_w_p_coords = self.random_gold_wumpus_pits()
+        self.g_w_p_coords = self.random_gold_wumpus_pits()
         chars = ['G', 'W', 'P', 'P', 'P']
 
-        for i, (row, col) in enumerate(g_w_p_coords):
-            self.assign_environment(row, col, chars[i])
+        for i, (row, col) in enumerate(self.g_w_p_coords):
+            self.world = func.assign_char(row, col, chars[i], self.world)
         self.add_stench_breeze()
 
-        self.print_world()
+        func.print_world(self.world)
 
 
     def locate_agent(self):
         for x in range(WORLD_SIZE):
             for y in range(WORLD_SIZE):
-                if self.check_char([self.world[x][y]], 'A'):
-                    self.remove_char(x, y, 'A')
+                if func.check_char([self.world[x][y]], 'A'):
+                    self.world = func.remove_char(x, y, 'A', self.world)
 
     def move_agent(self, x, y):
-        self.agent.reset_sensor()
-
-        self.locate_agent()
-        self.assign_environment(x, y, 'A')
         self.agent.location = (x, y)
-        self.perceive_agent(x, y)
+
+        if self.game_over():
+            sys.exit()
+        else:
+            self.agent.reset_sensor()
+            self.locate_agent()
+            self.world = func.assign_char(x, y, 'A', self.world)
+            print('ASSIGN A')
+            self.perceive_agent(x, y)
 
 
     def perceive_agent(self, x, y):
         cell = self.world[x][y]
         perceived = False
         
-        if self.check_char(cell, 'B'):
+        if func.check_char(cell, 'B'):
             self.agent.perceive('Breeze')
             perceived = True
-        if self.check_char(cell, 'G'):
+        if func.check_char(cell, 'G'):
             self.agent.perceive('Glitter')
             perceived = True
-        if self.check_char(cell, 'S'):
+        if func.check_char(cell, 'S'):
             self.agent.perceive('Stench')
             perceived = True
-        if not self.is_valid(x, y):
+        if not func.is_valid(x, y):
             self.agent.perceive('Bump')
             perceived = True
 
@@ -126,6 +101,15 @@ class WumpusWorld:
         # Perceive scream
         
 
+    def game_over(self):
+        #print(self.g_w_p_coords[1:])
+        for pos in self.g_w_p_coords[1:]:
+            if self.agent.location == pos:
+                # print("self.agent.location:", self.agent.location)
+                # print("pos:", pos)
+                print("GAME OVER")
+                return True
+        return False
 
 
 class Agent:
@@ -159,14 +143,12 @@ class Agent:
         for percept in self.sensor:
             self.sensor[percept] = None
 
-    def get_adjacent(self, x, y):
-        return [(x, y + 1), (x, y - 1), (x + 1, y), (x - 1, y)]
 
     def get_move(self):
         row, col = self.location[0], self.location[1] 
-        adj_cells = self.get_adjacent(row, col)
+        adj_cells = func.get_adjacent(row, col)
         
-        valid_adj_cells = [(x, y) for x, y in adj_cells if WumpusWorld.is_valid(self, x, y)]        
+        valid_adj_cells = [(x, y) for x, y in adj_cells if func.is_valid(x, y)]        
         random.shuffle(valid_adj_cells)
         print(valid_adj_cells)
         for x, y in valid_adj_cells:
@@ -210,34 +192,22 @@ class Agent:
         
     def infer(self):
         row, col = self.location[0], self.location[1] 
-        adjacent_cells = self.get_adjacent(row, col)
+        adjacent_cells = func.get_adjacent(row, col)
         predict = { 'Stench': 'W', 'Breeze': 'P', 'Glitter': 'G'}
 
         for key, value in self.kb.world_info[row][col].items():
             if value == True:
                 for adj_row, adj_col in adjacent_cells:
-                    if WumpusWorld.is_valid(self, adj_row, adj_col):
+                    if func.is_valid(adj_row, adj_col):
                         prediction = predict.get(key)
                         if key == "Glitter":
-                            self.assign_inference(row, col, prediction)
+                            self.inference = func.assign_char(row, col, prediction, self.inference)
                         else:
-                            self.assign_inference(adj_row, adj_col, prediction)
+                            self.inference = func.assign_char(adj_row, adj_col, prediction, self.inference)
 
-        for i in range(4):
-            print("|  ", end="")
-            for j in range(4):
-                print(self.inference[i][j], end="  ")
-                print("|  ", end="")
-            print()
+        func.print_world(self.inference)
+
             
-    def assign_inference(self, x, y, character):
-        if WumpusWorld.is_valid(self, x, y):
-            current_chars = set(self.inference[x][y])
-            current_chars.add(character)
-            self.inference[x][y] = ''.join(sorted(current_chars))
-        else:
-            #print("Error: Coordinates out of bounds!")
-            pass
 
 
 class Knowledge:
@@ -270,18 +240,18 @@ class Knowledge:
     
 
 
-# if __name__ == '__main__':
-#     ww = WumpusWorld()
-#     ww.prepare_environment()
+if __name__ == '__main__':
+    ww = WumpusWorld()
+    ww.prepare_environment()
 
-#     while True:
-#         x, y = ww.agent.get_move()
-#         #print(f"COORDINATE: ({x}, {y})")
+    while True:
+        x, y = ww.agent.get_move()
+        #print(f"COORDINATE: ({x}, {y})")
         
-#         ww.move_agent(x, y)
-#         #ww.agent.is_move_safe(x, y)
-#         ww.print_world()
-#         input()
+        ww.move_agent(x, y)
+        #ww.agent.is_move_safe(x, y)
+        func.print_world(ww.world)
+        input()
 
 
         

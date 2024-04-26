@@ -3,6 +3,7 @@ import pygame as pg
 space = 90
 mg_x = 90
 mg_y = 150
+WORLD_SIZE = 4
 
 AQUA = (49, 255, 255)
 WHITE = (255, 255, 255)
@@ -10,7 +11,7 @@ GREEN = (67, 83, 24)
 LIGHT_GREEN = (194, 203, 159)
 BLUE = (6, 61, 81)
 
-WORLD_SIZE = 4
+pg.font.init()
 
 class Draw:
     def __init__(self, screen):
@@ -22,7 +23,8 @@ class Draw:
         self.pit_img = pg.image.load("assets/cell_pit.png")
         self.stench_img = pg.image.load("assets/cell_stench.png")
         self.wumpus_img = pg.image.load("assets/cell_wumpus.png")
-        
+
+        self.font = pg.font.SysFont('Arial Black', 23)
 
     def board(self):
         pg.draw.rect(self.screen, LIGHT_GREEN, pg.Rect(mg_x, mg_y, 360, 360), 7)
@@ -68,15 +70,15 @@ class Draw:
         x = mg_x + col * space
         y = mg_y + row * space
 
-        if len(cell_type) > 1 and cell_type[0] == 'A':
-            if len(cell_type) == 3 and cell_type[1] == 'B' and cell_type[2] == 'S':
-                self.screen.blit(self.breeze_stench_img, (x, y))
-            elif len(cell_type) == 2 and cell_type[1] == 'B':
-                self.screen.blit(self.breeze_img, (x, y))
-            elif len(cell_type) == 2 and cell_type[1] == 'S':
-                self.screen.blit(self.stench_img, (x, y))
-            self.screen.blit(self.agent_img, (x+10, y+20))
-        elif cell_type == '':
+        # if len(cell_type) > 1 and cell_type[0] == 'A':
+        #     if len(cell_type) == 3 and cell_type[1] == 'B' and cell_type[2] == 'S':
+        #         self.screen.blit(self.breeze_stench_img, (x, y))
+        #     elif len(cell_type) == 2 and cell_type[1] == 'B':
+        #         self.screen.blit(self.breeze_img, (x, y))
+        #     elif len(cell_type) == 2 and cell_type[1] == 'S':
+        #         self.screen.blit(self.stench_img, (x, y))
+        #     self.screen.blit(self.agent_img, (x+10, y+20))
+        if cell_type == '':
             cell_rect = pg.Rect(x, y, space, space)
             pg.draw.rect(self.screen, BLUE, cell_rect)
         elif cell_type == 'B':
@@ -92,10 +94,17 @@ class Draw:
         elif cell_type == 'W' or cell_type == 'BW':
             self.screen.blit(self.wumpus_img, (x, y))
 
-        if cell_type == 'A':
-            cell_rect = pg.Rect(x, y, space, space)
-            pg.draw.rect(self.screen, BLUE, cell_rect)
-            self.screen.blit(self.agent_img, (x+10, y+20))
+        # if cell_type == 'A':
+        #     cell_rect = pg.Rect(x, y, space, space)
+        #     pg.draw.rect(self.screen, BLUE, cell_rect)
+        #     self.screen.blit(self.agent_img, (x+10, y+20))
+
+
+    def status(self, text):
+
+        
+        text1 = self.font.render(text, True, GREEN)
+        self.screen.blit(text1, (405, 230))	
 
                     
 
