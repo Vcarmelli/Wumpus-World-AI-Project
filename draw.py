@@ -18,6 +18,8 @@ class Draw:
         self.screen = screen
         self.agent_img = pg.image.load("assets/agent.png")
         self.agent_side_img = pg.image.load("assets/agent_side.png")
+        self.arrow_img = pg.image.load("assets/arrow.png")
+        self.arrow_side_img = pg.image.load("assets/arrow_side.png")
         self.breeze_img = pg.image.load("assets/cell_breeze.png")
         self.breeze_stench_img = pg.image.load("assets/cell_breeze-stench.png")
         self.gold_img = pg.image.load("assets/cell_gold.png")
@@ -89,12 +91,40 @@ class Draw:
             self.screen.blit(self.stench_img, (x, y))
         elif cell_type == 'W' or cell_type == 'BW':
             self.screen.blit(self.wumpus_img, (x, y))
+            
 
         # if cell_type == 'A':
         #     cell_rect = pg.Rect(x, y, space, space)
         #     pg.draw.rect(self.screen, BLUE, cell_rect)
         #     self.screen.blit(self.agent_img, (x+10, y+20))
 
+
+    def arrows(self, direction, pos, world):
+        row, col = pos
+
+        x = mg_x + col * space +10
+        y = mg_y + row * space +10
+        
+        if direction == "N":
+            for r in range(row, -1, -1):
+                self.screen.blit(self.arrow_img, (x, y))
+        elif direction == "S":
+            for r in range(row, 4):
+                #prev_y = y
+                y = mg_y + r * space +10
+                #self.fill_env(prev_y, x, world)
+                arrow_down = pg.transform.flip(self.arrow_img, False, True)
+                self.screen.blit(arrow_down, (x, y))
+        elif direction == "W":
+            for c in range(col, -1, -1):
+                x = mg_x + c * space +10
+                arrow_west = pg.transform.flip(self.arrow_side_img, True, False)
+                self.screen.blit(arrow_west, (x, y))
+        elif direction == "E":
+            for c in range(col, 4):
+                x = mg_x + c * space +10
+                self.screen.blit(self.arrow_side_img, (x, y))
+        
 
     def status(self, text, color):
         text_bg = pg.Surface((240, 90))

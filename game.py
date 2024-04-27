@@ -143,7 +143,7 @@ class Agent:
 
 
     def get_move(self):
-        row, col = self.location[0], self.location[1] 
+        row, col = self.location
         adj_cells = func.get_adjacent(row, col)
         
         valid_adj_cells = [(x, y) for x, y in adj_cells if func.is_valid(x, y)]        
@@ -189,7 +189,7 @@ class Agent:
             return -1
         
     def direction(self, x, y):
-        row, col = self.location[0], self.location[1] 
+        row, col = self.location
         if x == row - 1:
             self.facing = 'N'
         elif x == row + 1:
@@ -201,7 +201,7 @@ class Agent:
 
         
     def infer(self):
-        row, col = self.location[0], self.location[1] 
+        row, col = self.location
         adjacent_cells = func.get_adjacent(row, col)
         predict = { 'Stench': 'W', 'Breeze': 'P', 'Glitter': 'G'}
 
@@ -216,6 +216,10 @@ class Agent:
                             self.inference = func.assign_char(adj_row, adj_col, prediction, self.inference)
 
         func.print_world(self.inference)
+
+
+    #def shoot(self, line):
+
             
 
 

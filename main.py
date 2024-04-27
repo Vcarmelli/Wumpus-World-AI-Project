@@ -17,7 +17,7 @@ TRANSPARENT = (0, 0, 0, 255)
 
 
 screen = pg.display.set_mode((780, 550))
-pg.display.set_caption("Wumpus World")
+pg.display.set_caption("Wumpus World (Space Edition) by VKVC")
 
 def generate_board():
     board = np.zeros((4, 4))
@@ -86,6 +86,7 @@ def wumpus_world():
         elif stats == 1:
             draw.status(" Game over. You met the Wumpus!", WHITE) 
             draw.environment(ww.world)
+            draw.arrows(ww.agent.facing, ww.agent.location, ww.world)
             over()
         elif 2 <= stats < 5:
             draw.status(" Game over. You fall into the pit!", WHITE) 
@@ -157,7 +158,7 @@ def wumpus_world():
         draw.score(f"{ww.agent.score}", GREEN)
         draw.status("Click the 'Play AI' button!", WHITE)          
         draw.agent(ww.cur_row, ww.cur_col, ww.agent.facing)  
-                
+        
         draw.board()
         pg.display.flip()
 
