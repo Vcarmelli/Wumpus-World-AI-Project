@@ -119,6 +119,7 @@ class Agent:
             'Scream': None
         }
         self.location = (0, 0)
+        self.facing = 'S'
         self.score = 1000
         self.kb = Knowledge()
         self.inference = [[''] * 4 for _ in range(4)] 
@@ -186,6 +187,18 @@ class Agent:
             true_values = [key for key, value in self.kb.world_info[x][y].items() if value is True]
             print(f'THERE IS {true_values} in ({x}, {y})')
             return -1
+        
+    def direction(self, x, y):
+        row, col = self.location[0], self.location[1] 
+        if x == row - 1:
+            self.facing = 'N'
+        elif x == row + 1:
+            self.facing = 'S'
+        elif y == col - 1:
+            self.facing = 'W'
+        elif y == col + 1:
+            self.facing = 'E'
+
         
     def infer(self):
         row, col = self.location[0], self.location[1] 

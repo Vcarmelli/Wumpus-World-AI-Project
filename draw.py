@@ -17,6 +17,7 @@ class Draw:
     def __init__(self, screen):
         self.screen = screen
         self.agent_img = pg.image.load("assets/agent.png")
+        self.agent_side_img = pg.image.load("assets/agent_side.png")
         self.breeze_img = pg.image.load("assets/cell_breeze.png")
         self.breeze_stench_img = pg.image.load("assets/cell_breeze-stench.png")
         self.gold_img = pg.image.load("assets/cell_gold.png")
@@ -36,11 +37,21 @@ class Draw:
             pg.draw.line(self.screen, LIGHT_GREEN, (mg_x + i * space, mg_y), (mg_x + i * space, mg_y + 355), line_width)
             i += 1
 
-    def agent(self, row, col):
+    def agent(self, row, col, direction):
         x = mg_x + col * space +10
         y = mg_y + row * space +20
+
+        if direction == 'N':
+            y -= 10
+            self.screen.blit(self.agent_img, (x, y))
+        elif direction == 'S':
+            self.screen.blit(self.agent_img, (x, y))
+        elif direction == 'W':
+            self.screen.blit(self.agent_side_img, (x, y))
+        elif direction == 'E':
+            agent_rightside = pg.transform.flip(self.agent_side_img, True, False)
+            self.screen.blit(agent_rightside, (x, y))
         
-        self.screen.blit(self.agent_img, (x, y))
         self.board()
 
     def environment(self, world):
