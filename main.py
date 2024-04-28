@@ -82,6 +82,8 @@ def wumpus_world():
             draw.status("Game is ongoing!", LIGHT_GREEN)            
         elif stats == 0:
             draw.status(" You found the  golden treasure!", WHITE) 
+            ww.world = ww.agent.grab(ww.cur_row, ww.cur_col, ww.world)
+            draw.fill_env(ww.cur_row, ww.cur_col, ww.world)  
             pg.display.update()
         elif stats == 1:
             draw.status(" Game over. You met the Wumpus!", WHITE) 
@@ -130,30 +132,36 @@ def wumpus_world():
                         pg.display.update()
                         
             
-            # if event.type == pg.KEYDOWN:
-            #     if event.key == pg.K_RIGHT:
-            #         if ww.cur_col < 3:
-            #             ww.cur_col += 1
-            #             draw.fill_env(ww.cur_row, ww.cur_col, ww.world)  
-            #             ww.move_agent(ww.cur_row, ww.cur_col)
-            #     elif event.key == pg.K_LEFT:
-            #         if ww.cur_col > 0:
-            #             ww.cur_col -= 1
-            #             draw.fill_env(ww.cur_row, ww.cur_col, ww.world)   
-            #             ww.move_agent(ww.cur_row, ww.cur_col)
-            #     elif event.key == pg.K_DOWN:
-            #         if ww.cur_row < 3:
-            #             ww.cur_row += 1
-            #             draw.fill_env(ww.cur_row, ww.cur_col, ww.world)  
-            #             ww.move_agent(ww.cur_row, ww.cur_col)
-            #     elif event.key == pg.K_UP:
-            #         if ww.cur_row > 0:
-            #             ww.cur_row -= 1
-            #             draw.fill_env(ww.cur_row, ww.cur_col, ww.world)   
-            #             ww.move_agent(ww.cur_row, ww.cur_col)
+        #     if event.type == pg.KEYDOWN:
+        #         if event.key == pg.K_RIGHT:
+        #             if ww.cur_col < 3:
+        #                 ww.cur_col += 1
+        #                 draw.fill_env(ww.cur_row, ww.cur_col, ww.world)  
+        #                 ww.move_agent(ww.cur_row, ww.cur_col)
+        #         elif event.key == pg.K_LEFT:
+        #             if ww.cur_col > 0:
+        #                 ww.cur_col -= 1
+        #                 draw.fill_env(ww.cur_row, ww.cur_col, ww.world)   
+        #                 ww.move_agent(ww.cur_row, ww.cur_col)
+        #         elif event.key == pg.K_DOWN:
+        #             if ww.cur_row < 3:
+        #                 ww.cur_row += 1
+        #                 draw.fill_env(ww.cur_row, ww.cur_col, ww.world)  
+        #                 ww.move_agent(ww.cur_row, ww.cur_col)
+        #         elif event.key == pg.K_UP:
+        #             if ww.cur_row > 0:
+        #                 ww.cur_row -= 1
+        #                 draw.fill_env(ww.cur_row, ww.cur_col, ww.world)   
+        #                 ww.move_agent(ww.cur_row, ww.cur_col)
    
                 
-            #     ww.path[ww.cur_row][ww.cur_col] = 1     
+        #         ww.path[ww.cur_row][ww.cur_col] = 1   
+
+        # for row in range(4):
+        #     for col in range(4):
+        #         if ww.path[row][col]:
+        #             draw.fill_env(row, col, ww.world)
+        #         draw.agent(ww.cur_row, ww.cur_col, ww.agent.facing)    
 
         draw.score(f"{ww.agent.score}", GREEN)
         draw.status("Click the 'Play AI' button!", WHITE)          

@@ -107,7 +107,7 @@ class WumpusWorld:
                 #print("GAME OVER")
                 return i
         return -1
-
+    
 
 class Agent:
     def __init__(self):
@@ -216,6 +216,11 @@ class Agent:
                             self.inference = func.assign_char(adj_row, adj_col, prediction, self.inference)
 
         func.print_world(self.inference)
+
+    def grab(self, x, y, world):
+        world = func.remove_char(x, y, 'G', world[:])
+        self.score += 1000
+        return world
 
 
     #def shoot(self, line):
