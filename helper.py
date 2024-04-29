@@ -40,21 +40,29 @@ class Helper:
         for i in range(-1, WORLD_SIZE):
             for j in range(-1, WORLD_SIZE):
                 # Generate horizontal patterns
-                horizontal_triangle1 = [(i, j), (i + 1, j + 1), (i, j + 2)]
-                horizontal_triangle2 = [(i + 1, j), (i, j + 1), (i + 1, j + 2)]
-                # Check if all coordinates are within bounds before adding to patterns_list
-                if all(0 <= coord[0] < WORLD_SIZE and 0 <= coord[1] < WORLD_SIZE for triangle in [horizontal_triangle1, horizontal_triangle2] for coord in triangle):
-                    patterns_list.extend([{"pattern": horizontal_triangle1, "location": (i, j + 1)}, {"pattern": horizontal_triangle2, "location": (i + 1, j + 1)}])
+                triangle = [(i, j), (i + 1, j + 1), (i, j + 2)]
+                patterns_list.append({"pattern": triangle, "location": (i, j + 1)})
+
+                triangle = [(i + 1, j), (i, j + 1), (i + 1, j + 2)]
+                patterns_list.append({"pattern": triangle, "location": (i + 1, j + 1)})
 
                 # Generate vertical patterns
-                vertical_triangle1 = [(i, j), (i + 1, j + 1), (i + 2, j)]
-                vertical_triangle2 = [(i, j + 1), (i + 1, j), (i + 2, j + 1)]
-                # Check if all coordinates are within bounds before adding to patterns_list
-                if all(0 <= coord[0] < WORLD_SIZE and 0 <= coord[1] < WORLD_SIZE for triangle in [vertical_triangle1, vertical_triangle2] for coord in triangle):
-                    patterns_list.extend([{"pattern": vertical_triangle1, "location": (i + 1, j)}, {"pattern": vertical_triangle2, "location": (i + 1, j + 1)}])
+                triangle = [(i, j), (i + 1, j + 1), (i + 2, j)]
+                patterns_list.append({"pattern": triangle, "location": (i + 1, j)})
 
+                triangle = [(i, j + 1), (i + 1, j), (i + 2, j + 1)]
+                patterns_list.append({"pattern": triangle, "location": (i + 1, j + 1)})
 
-        print("patterns_list:", patterns_list)
+        # ensure there are at least two valid cell patterns in the grid
+        patterns_list = [pattern for pattern in patterns_list if sum(1 for coord in pattern["pattern"] if self.is_valid(coord[0], coord[1])) > 1] 
+
+        # remove the cells outside the world size
+        for pattern in patterns_list:
+            pattern["pattern"] = [coord for coord in pattern["pattern"] if self.is_valid(coord[0], coord[1])]
+
+        # for pattern in patterns_list:
+        #     print("Pattern:", pattern["pattern"], "Location:", pattern["location"])
+
         return patterns_list
     
     def print_world(self, world):    

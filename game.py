@@ -134,7 +134,8 @@ class Agent:
             self.sensor[percept] = True 
             
         self.kb.add(self.location, self.sensor)
-        self.infer()
+        #self.infer()
+        self.predict()
 
 
     def reset_sensor(self):
@@ -222,18 +223,24 @@ class Agent:
         self.score += 1000
         return world
 
-    def predict(self, x, y):
+    def predict(self):
         possible_pos = func.generate_patterns()
-        row, col = self.location
+
+
         for i in range(WORLD_SIZE):
             for j in range(WORLD_SIZE):
                 for key, value in self.kb.world_info[i][j].items():
-                    if value == True:
+                    if value:  # No need to check if value == True
                         for pattern in possible_pos:
-                            for coord in pattern:
-                                if (i, j) == coord:
+                            if all(self.kb.world_info[coord[0]][coord[1]].get(key) for coord in pattern["pattern"]):
+                                    row, col = pattern["location"]
                                     if key == "Stench":
-                                        self.inference[i, j] = 'W'
+                                        self.inference = func.assign_char(row, col, 'W', self.inference)
+                                    elif key == "Breeze":
+                                        self.inference = func.assign_char(row, col, 'P', self.inference)
+                                        
+
+        func.print_world(self.inference) 
                         
     #def shoot(self, line):
 
@@ -270,18 +277,18 @@ class Knowledge:
     
 
 
-# if __name__ == '__main__':
-#     ww = WumpusWorld()
-#     ww.prepare_environment()
+if __name__ == '__main__':
+    ww = WumpusWorld()
+    ww.prepare_environment()
 
-#     while True:
-#         x, y = ww.agent.get_move()
-#         #print(f"COORDINATE: ({x}, {y})")
+    while True:
+        x, y = ww.agent.get_move()
+        #print(f"COORDINATE: ({x}, {y})")
         
-#         ww.move_agent(x, y)
-#         #ww.agent.is_move_safe(x, y)
-#         func.print_world(ww.world)
-#         input()
+        ww.move_agent(x, y)
+        #ww.agent.is_move_safe(x, y)
+        func.print_world(ww.world)
+        input()
 
 
         
