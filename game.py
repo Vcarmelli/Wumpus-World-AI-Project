@@ -222,7 +222,19 @@ class Agent:
         self.score += 1000
         return world
 
-
+    def predict(self, x, y):
+        possible_pos = func.generate_patterns()
+        row, col = self.location
+        for i in range(WORLD_SIZE):
+            for j in range(WORLD_SIZE):
+                for key, value in self.kb.world_info[i][j].items():
+                    if value == True:
+                        for pattern in possible_pos:
+                            for coord in pattern:
+                                if (i, j) == coord:
+                                    if key == "Stench":
+                                        self.inference[i, j] = 'W'
+                        
     #def shoot(self, line):
 
             
