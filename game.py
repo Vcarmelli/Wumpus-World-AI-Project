@@ -226,7 +226,10 @@ class Agent:
     def predict(self):
         possible_pos = func.generate_patterns()
 
-
+        # CAN BE USE FOR CHECKING 
+        # BETTER IF 3 MATCH THE POSSIBLE POS
+        # CONSIDER THE NUMBER OF PITS AND WUMPUS 
+        
         for i in range(WORLD_SIZE):
             for j in range(WORLD_SIZE):
                 for key, value in self.kb.world_info[i][j].items():
@@ -234,17 +237,16 @@ class Agent:
                         for pattern in possible_pos:
                             if all(self.kb.world_info[coord[0]][coord[1]].get(key) for coord in pattern["pattern"]):
                                     row, col = pattern["location"]
+                                    print("pattern: ", pattern["pattern"])
                                     if key == "Stench":
                                         self.inference = func.assign_char(row, col, 'W', self.inference)
                                     elif key == "Breeze":
                                         self.inference = func.assign_char(row, col, 'P', self.inference)
                                         
-
         func.print_world(self.inference) 
-                        
-    #def shoot(self, line):
+        
 
-            
+    #def shoot(self, line):
 
 
 class Knowledge:
