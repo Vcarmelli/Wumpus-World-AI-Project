@@ -1,74 +1,51 @@
-class WumpusWorldAI:
-    def __init__(self, world_size):
-        self.world_size = world_size
-        self.knowledge_base = []
+from itertools import combinations
 
-    def add_knowledge(self, statement):
-        self.knowledge_base.append(statement)
+WORLD_SIZE = 4
 
-    def forward_chaining(self, goal):
-        inferred = {}
-        count = {}
+def print_grid_with_pattern(grid, pattern):
+    print("pattern", pattern)
+    for i, row in enumerate(grid):
+        for j, cell in enumerate(row):
+            if (i, j) in pattern:
+                print(f'[{cell}]', end=' ')
+            else:
+                print(f' {cell} ', end=' ')
+        print()
 
-        for clause in self.knowledge_base:
-            for symbol in clause:
-                if symbol in inferred:
-                    continue
-                inferred[symbol] = False
-                count[symbol] = 0
-                print(inferred)
-                print(symbol)
+def print_patterns_with_grid(grid, patterns):
+    print("Grid with Patterns:")
+    for idx, pattern in enumerate(patterns, 1):
+        print(f"Pattern {idx}:")
+        print_grid_with_pattern(grid, pattern)
+        print()
 
-        inferred[goal] = False  # Initialize the goal symbol
+def get_adjacent(x, y):
+    adjacent_coords = [
+        (x, y + 1),  # Right
+        (x, y - 1),  # Left
+        (x + 1, y),  # Down
+        (x - 1, y)   # Up
+    ]
+    
+    # Filter out coordinates outside the grid
+    adjacent_coords = [(x, y) for (x, y) in adjacent_coords if 0 <= x < WORLD_SIZE and 0 <= y < WORLD_SIZE]
+    
+    return list(combinations(adjacent_coords, 3))
 
-        agenda = [goal]
-        while agenda:
-            p = agenda.pop(0)
-            print(p)
-            if p == goal:
-                self.propagate(goal, inferred, count, agenda)
-                return inferred[goal]
+grid = [
+    ['S', 'S', 'S', 'S'],
+    ['S', 'S', 'S', 'S'],
+    ['S', 'S', 'S', 'S'],
+    ['S', 'S', 'S', 'S']
+]
 
-            for clause in self.knowledge_base:
-                if p in clause:
-                    count[p] += 1
-                    if count[p] == len(clause) - 1 and not inferred[p]:
-                        inferred[p] = True
-                        agenda.append(p)
+patterns_for_grid = []
 
-    def propagate(self, goal, inferred, count, agenda):
-        for clause in self.knowledge_base:
-            if goal in clause:
-                for symbol in clause:
-                    if symbol != goal:
-                        count[symbol] += 1
-                        if count[symbol] == len(clause) - 1 and not inferred[symbol]:
-                            inferred[symbol] = True
-                            agenda.append(symbol)
-                            print(agenda)
+# Generate patterns for each cell in the grid
+for i in range(WORLD_SIZE):
+    for j in range(WORLD_SIZE):
+        patterns_for_cell = get_adjacent(i, j)
+        patterns_for_grid.append(patterns_for_cell)
 
-    def backward_chaining(self, goal):
-        return self.backward_chaining_helper(goal, {})
-
-    def backward_chaining_helper(self, goal, inferred):
-        if goal in inferred:
-            return inferred[goal]
-
-        for clause in self.knowledge_base:
-            if goal in clause:
-                for symbol in clause:
-                    if symbol != goal:
-                        print(goal)
-                        if not self.backward_chaining_helper(symbol, inferred):
-                            return False
-                        
-        inferred[goal] = True
-        return True
-
-
-# Example usage:
-if __name__ == "__main__":
-    wumpus_ai = WumpusWorldAI(world_size=(4, 4))
-    wumpus_ai.add_knowledge([("Breeze", (1, 1)), ("Breeze", (1, 2))])  # Example knowledge
-    print("Forward Chaining Result:", wumpus_ai.forward_chaining(("Pit", (1, 3))))
-    print("Backward Chaining Result:", wumpus_ai.backward_chaining(("Pit", (1, 3))))
+# Print the grid with its corresponding patterns
+print_patterns_with_grid(grid, patterns_for_grid)

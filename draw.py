@@ -68,15 +68,16 @@ class Draw:
         x = mg_x + col * space
         y = mg_y + row * space
 
-        # if len(cell_type) > 1 and cell_type[0] == 'A':
-        #     if len(cell_type) == 3 and cell_type[1] == 'B' and cell_type[2] == 'S':
-        #         self.screen.blit(self.breeze_stench_img, (x, y))
-        #     elif len(cell_type) == 2 and cell_type[1] == 'B':
-        #         self.screen.blit(self.breeze_img, (x, y))
-        #     elif len(cell_type) == 2 and cell_type[1] == 'S':
-        #         self.screen.blit(self.stench_img, (x, y))
-        #     self.screen.blit(self.agent_img, (x+10, y+20))
-        if cell_type == '':
+        if len(cell_type) > 1 and cell_type[0] == 'A':
+            if len(cell_type) == 3 and cell_type[1] == 'B' and cell_type[2] == 'S':
+                self.screen.blit(self.breeze_stench_img, (x, y))
+            elif len(cell_type) == 2 and cell_type[1] == 'B':
+                self.screen.blit(self.breeze_img, (x, y))
+            elif len(cell_type) == 2 and cell_type[1] == 'S':
+                self.screen.blit(self.stench_img, (x, y))
+            elif len(cell_type) == 2 and cell_type[1] == 'G':
+                self.screen.blit(self.gold_img, (x, y))
+        if cell_type == '' or cell_type == 'A':
             cell_rect = pg.Rect(x, y, space, space)
             pg.draw.rect(self.screen, BLUE, cell_rect)
         elif cell_type == 'B':
@@ -91,12 +92,9 @@ class Draw:
             self.screen.blit(self.stench_img, (x, y))
         elif cell_type == 'W' or cell_type == 'BW':
             self.screen.blit(self.wumpus_img, (x, y))
-            
 
-        # if cell_type == 'A':
-        #     cell_rect = pg.Rect(x, y, space, space)
-        #     pg.draw.rect(self.screen, BLUE, cell_rect)
-        #     self.screen.blit(self.agent_img, (x+10, y+20))
+        self.board()
+            
 
 
     def arrows(self, direction, pos, world):
