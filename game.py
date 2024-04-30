@@ -7,13 +7,14 @@ func = Helper()
 
 class WumpusWorld:
     def __init__(self):
+        self.agent = Agent()
+        self.cur_row = 0
+        self.cur_col = 0
         self.path = [[0] * 4 for _ in range(4)] 
         self.path[0][0] = 1
         self.world = [[''] * 4 for _ in range(4)] 
         self.world[0][0] = 'A'
-        self.cur_row = 0
-        self.cur_col = 0
-        self.agent = Agent()
+
 
     def reset_world(self):
         self.cur_row = 0
@@ -22,7 +23,7 @@ class WumpusWorld:
         self.path[0][0] = 1
         self.world = [[''] * 4 for _ in range(4)] 
         self.world[0][0] = 'A'
-
+        
 
     def random_gold_wumpus_pits(self):
         coordinates = set()  # Use a set to ensure uniqueness
@@ -56,6 +57,7 @@ class WumpusWorld:
         self.add_stench_breeze()
 
         func.print_world(self.world)
+        self.perceive_agent(self.cur_row, self.cur_col)
 
 
     def locate_agent(self):
@@ -66,11 +68,14 @@ class WumpusWorld:
 
     def move_agent(self, x, y):
         self.agent.location = (x, y)
-
         self.agent.reset_sensor()
+
+        self.perceive_agent(x, y)
+        self.agent.clear_safe()  
+        print("AFTER CLEARING")      
+        func.print_world(self.agent.inference)
         self.locate_agent()
         self.world = func.assign_char(x, y, 'A', self.world)
-        self.perceive_agent(x, y)
         self.agent.score -= 1
 
 
@@ -136,6 +141,7 @@ class Agent:
         self.kb.add(self.location, self.sensor)
         #self.infer()
         self.predict()
+        
 
 
     def reset_sensor(self):
@@ -155,6 +161,7 @@ class Agent:
             if safety == -1:
                 continue
             else:
+                #if safety == 1: self.clear_safe()
                 for i in range(len(self.prev_moves) - 2):
                     if (x, y) == self.prev_moves[i]:
                         print(i)
@@ -188,6 +195,7 @@ class Agent:
             true_values = [key for key, value in self.kb.world_info[x][y].items() if value is True]
             print(f'THERE IS {true_values} in ({x}, {y})')
             return -1
+        
         
     def direction(self, x, y):
         row, col = self.location
@@ -237,13 +245,24 @@ class Agent:
                         for pattern in possible_pos:
                             if all(self.kb.world_info[coord[0]][coord[1]].get(key) for coord in pattern["pattern"]):
                                     row, col = pattern["location"]
-                                    print("pattern: ", pattern["pattern"])
+                                    print("Pattern:", pattern["pattern"], "Location:", pattern["location"])
                                     if key == "Stench":
                                         self.inference = func.assign_char(row, col, 'W', self.inference)
                                     elif key == "Breeze":
                                         self.inference = func.assign_char(row, col, 'P', self.inference)
-                                        
-        func.print_world(self.inference) 
+                                    print(self.inference)
+        #self.clear_safe()                                
+        #func.print_world(self.inference) 
+
+    def clear_safe(self):
+
+        for x in range(WORLD_SIZE):
+            for y in range(WORLD_SIZE):
+                if self.kb.world_info[x][y]:
+                    if all(value is None for value in self.kb.world_info[x][y].values()):
+                        self.inference[x][y] = ''
+                else:
+                    pass
         
 
     #def shoot(self, line):
@@ -279,18 +298,18 @@ class Knowledge:
     
 
 
-if __name__ == '__main__':
-    ww = WumpusWorld()
-    ww.prepare_environment()
+# if __name__ == '__main__':
+#     ww = WumpusWorld()
+#     ww.prepare_environment()
 
-    while True:
-        x, y = ww.agent.get_move()
-        #print(f"COORDINATE: ({x}, {y})")
+#     while True:
+#         x, y = ww.agent.get_move()
+#         #print(f"COORDINATE: ({x}, {y})")
         
-        ww.move_agent(x, y)
-        #ww.agent.is_move_safe(x, y)
-        func.print_world(ww.world)
-        input()
+#         ww.move_agent(x, y)
+#         #ww.agent.is_move_safe(x, y)
+#         func.print_world(ww.world)
+#         input()
 
 
         

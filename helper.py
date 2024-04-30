@@ -78,7 +78,7 @@ class Helper:
 
 
 
-h = Helper()
+# h = Helper()
 
 # def print_grid_with_pattern(grid, pattern):
 #     for i, row in enumerate(grid):
@@ -105,7 +105,7 @@ h = Helper()
 # ]
 
 # # Generate patterns dynamically for a 4x4 grid
-h.generate_patterns()
+# h.generate_patterns()
 
 # # Print each grid with its pattern
 # print_patterns_with_grid(grid, patterns)
