@@ -18,6 +18,7 @@ class Draw:
         self.screen = screen
         self.agent_img = pg.image.load("assets/agent.png")
         self.agent_side_img = pg.image.load("assets/agent_side.png")
+        self.agent_victory_img = pg.image.load("assets/agent_victory.png")
         self.arrow_img = pg.image.load("assets/arrow.png")
         self.arrow_side_img = pg.image.load("assets/arrow_side.png")
         self.breeze_img = pg.image.load("assets/cell_breeze.png")
@@ -53,6 +54,8 @@ class Draw:
         elif direction == 'E':
             agent_rightside = pg.transform.flip(self.agent_side_img, True, False)
             self.screen.blit(agent_rightside, (x, y))
+        elif direction == 'V':
+            self.screen.blit(self.agent_victory_img, (x-10, y-20))
         
         self.board()
 

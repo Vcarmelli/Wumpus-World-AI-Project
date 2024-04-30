@@ -105,13 +105,17 @@ class WumpusWorld:
 
     def game_status(self):
         #print(self.g_w_p_coords[1:])
-        for i, pos in enumerate(self.g_w_p_coords):
-            if self.agent.location == pos:
-                # print("self.agent.location:", self.agent.location)
-                # print("pos:", pos)
-                #print("GAME OVER")
-                return i
-        return -1
+        if self.agent.has_gold:
+            print("GO BACK GOAL DONE")
+            return 9
+        else:
+            for i, pos in enumerate(self.g_w_p_coords):
+                if self.agent.location == pos:
+                    # print("self.agent.location:", self.agent.location)
+                    # print("pos:", pos)
+                    #print("GAME OVER")
+                    return i
+            return -1
     
 
 class Agent:
@@ -125,10 +129,12 @@ class Agent:
         }
         self.location = (0, 0)
         self.facing = 'S'
+        self.has_gold = False
         self.score = 1000
         self.kb = Knowledge()
         self.count_loop = 0
         self.prev_moves = [] 
+        self.unsafe = []
 
 
     def perceive(self, percept):
@@ -140,51 +146,57 @@ class Agent:
         self.kb.add(self.location, self.sensor)
         #self.infer()
         self.predict()
-        
-
+    
 
     def reset_sensor(self):
         for percept in self.sensor:
             self.sensor[percept] = None
 
+    def get_move(self, got_gold):
+        if got_gold:
+            return self.back_to_init_move()
+        else:
+            return self.normal_move()
 
-    def get_move(self):
+    def normal_move(self):
         row, col = self.location
         adj_cells = func.get_adjacent(row, col)
         
         valid_adj_cells = [(x, y) for x, y in adj_cells if func.is_valid(x, y)]        
         random.shuffle(valid_adj_cells)
-        print(valid_adj_cells)
+        #print(valid_adj_cells)
+        
         for x, y in valid_adj_cells:
             safety = self.is_move_safe(x, y)
             if safety == -1:
                 continue
-            else:
-    
-                for i in range(len(self.prev_moves) - 2):
-                    if (x, y) == self.prev_moves[i]:
-                        # print("Current move is the same as a move made two steps ago.")
-                        self.count_loop += 1
-                        #print("self.count_loop", self.count_loop)
-                
-                    if self.count_loop == 3:
-                        self.prev_moves = []
-                        self.count_loop = 0
-                        valid_adj_cells.remove((x, y))
-                        return random.choice(valid_adj_cells)
-                        
-                # print("Current move:", (x, y))
-                # print("Previous moves:", self.prev_moves)
-                
-                self.prev_moves.append((x, y))
-                return x, y
+            elif safety == 0 and self.predict_unsafe(x, y):   # agent doesn't have knowledge about that cell  
+                print('NO KNOWLEDGE and unsafe')                 # then it will check the move based on the prediction made from the hints
+                continue                                            
+            
+            for i in range(len(self.prev_moves) - 2):
+                if (x, y) == self.prev_moves[i]:
+                    # print("Current move is the same as a move made two steps ago.")
+                    self.count_loop += 1
+                    #print("self.count_loop", self.count_loop)
+            
+                if self.count_loop == 3:
+                    self.prev_moves = []
+                    self.count_loop = 0
+                    valid_adj_cells.remove((x, y))
+                    return random.choice(valid_adj_cells)
+                    
+            # print("Current move:", (x, y))
+            # print("Previous moves:", self.prev_moves)
+            
+            self.prev_moves.append((x, y))
+            return x, y
             
         return random.choice(valid_adj_cells)
 
     def is_move_safe(self, x, y):
         #print(self.kb.world_info[x][y])
-        if not self.kb.world_info[x][y]:
-            print('NO KNOWLEDGE')
+        if not self.kb.world_info[x][y]: # no knowledge 
             return 0
         elif all(value is None for value in self.kb.world_info[x][y].values()):
             print(f'YES ({x}, {y}) SAFE')
@@ -193,6 +205,34 @@ class Agent:
             true_values = [key for key, value in self.kb.world_info[x][y].items() if value is True]
             print(f'THERE IS {true_values} in ({x}, {y})')
             return -1
+        
+    def back_to_init_move(self):
+        row, col = self.location
+        adj_cells = func.get_adjacent(row, col)
+        
+        valid_adj_cells = [(x, y) for x, y in adj_cells if func.is_valid(x, y)]        
+        valid_adj_cells.sort(key=lambda cell: abs(cell[0] - 0) + abs(cell[1] - 0))
+
+        print("CELL NEAR 00:", valid_adj_cells)
+        for x, y in valid_adj_cells:
+            safety = self.is_move_safe(x, y)
+            
+            if safety == 0 and self.predict_unsafe(x, y):   # agent doesn't have knowledge about that cell  
+                print('NO KNOWLEDGE and unsafe')            # then it will check the move based on the prediction made from the hints
+                continue                             
+            for i in range(len(self.prev_moves) - 2):
+                if (x, y) == self.prev_moves[i]:
+                    self.count_loop += 1
+                if self.count_loop == 3:
+                    self.prev_moves = []
+                    self.count_loop = 0
+                    valid_adj_cells.remove((x, y))
+                    return random.choice(valid_adj_cells)
+            
+            self.prev_moves.append((x, y))
+            return x, y
+        
+        return random.choice(valid_adj_cells)
         
         
     def direction(self, x, y):
@@ -230,6 +270,7 @@ class Agent:
     def grab(self, x, y, world):
         world = func.remove_char(x, y, 'G', world[:])
         self.score += 1000
+        self.has_gold = True
         return world
 
     def predict(self):
@@ -249,23 +290,30 @@ class Agent:
                         for pattern in possible_pos:
                             if all(self.kb.world_info[coord[0]][coord[1]].get(key) for coord in pattern["pattern"]):
                                 row, col = pattern["location"]
-                                print("Pattern:", pattern["pattern"], "Location:", pattern["location"])
+                                #print("Pattern:", pattern["pattern"], "Location:", pattern["location"])
                                 self.kb.inference = func.assign_char(row, col, prediction, self.kb.inference)
+                                
                             
         print(self.kb.inference)
         #self.clear_safe()                                
         #func.print_world(self.kb.inference) 
 
     def clear_safe(self):
-
         for x in range(WORLD_SIZE):
             for y in range(WORLD_SIZE):
                 if self.kb.world_info[x][y]:
                     if all(value is None for value in self.kb.world_info[x][y].values()):
                         self.kb.inference[x][y] = ''
-                else:
-                    pass
-        
+                elif self.kb.inference[x][y] != '':
+                    if (x, y) not in self.unsafe: self.unsafe.append((x, y))  # reconrd unsafe cells based on prediction
+                    
+
+    def predict_unsafe(self, x, y):
+        if (x, y) in self.unsafe:
+            print("UNSAFE:", self.unsafe)
+            print((x, y))
+            return True
+        return False
 
     #def shoot(self, line):
 

@@ -92,7 +92,7 @@ def wumpus_world():
 
                 if btn_ai.click_button(MOUSE_POS):
                     while True:
-                        ww.cur_row, ww.cur_col = ww.agent.get_move()
+                        ww.cur_row, ww.cur_col = ww.agent.get_move(ww.agent.has_gold)
                         ww.agent.direction(ww.cur_row, ww.cur_col)
                         draw.fill_env(ww.cur_row, ww.cur_col, ww.world)  
                         ww.move_agent(ww.cur_row, ww.cur_col)
@@ -112,7 +112,7 @@ def wumpus_world():
                         if stats == -1:
                             draw.status("Game is ongoing!", LIGHT_GREEN)            
                         elif stats == 0:
-                            draw.status(" You found the  golden treasure!", WHITE) 
+                            draw.status(" You found the  golden treasure!", WHITE)                             
                             ww.world = ww.agent.grab(ww.cur_row, ww.cur_col, ww.world)
                             draw.agent(ww.cur_row, ww.cur_col, ww.agent.facing)  
                             #draw.fill_env(ww.cur_row, ww.cur_col, ww.world)  
@@ -125,8 +125,15 @@ def wumpus_world():
                             over()
                         elif 2 <= stats < 5:
                             draw.status(" Game over. You fall into the pit!", WHITE) 
+                            
                             draw.environment(ww.world)
                             over()
+                        elif stats == 9:
+                            if ww.agent.location == (0, 0):
+                                draw.status("   Agent win!   Congratulations!", WHITE) 
+                                draw.environment(ww.world)
+                                draw.agent(ww.cur_row, ww.cur_col, 'V')  
+                                over()
                         else:
                             continue
                         pg.display.update()
