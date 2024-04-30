@@ -106,8 +106,9 @@ class WumpusWorld:
     def game_status(self):
         #print(self.g_w_p_coords[1:])
         if self.agent.has_gold:
-            print("GO BACK GOAL DONE")
             return 9
+        elif self.agent.w_found:
+            return 10
         else:
             for i, pos in enumerate(self.g_w_p_coords):
                 if self.agent.location == pos:
@@ -135,6 +136,8 @@ class Agent:
         self.count_loop = 0
         self.prev_moves = [] 
         self.unsafe = []
+        self.w_pos = ()
+        self.w_found = False
 
 
     def perceive(self, percept):
@@ -292,6 +295,9 @@ class Agent:
                                 row, col = pattern["location"]
                                 #print("Pattern:", pattern["pattern"], "Location:", pattern["location"])
                                 self.kb.inference = func.assign_char(row, col, prediction, self.kb.inference)
+                                if key == "Stench":
+                                    self.wumpus_located(row, col, True)
+                                    print()
                                 
                             
         print(self.kb.inference)
@@ -315,7 +321,9 @@ class Agent:
             return True
         return False
 
-    #def shoot(self, line):
+    def wumpus_located(self, x, y, found):
+        self.w_pos = (x, y)
+        self.w_found = found
 
 
 class Knowledge:

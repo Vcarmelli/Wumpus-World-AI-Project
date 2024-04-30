@@ -121,7 +121,6 @@ def wumpus_world():
                         elif stats == 1:
                             draw.status(" Game over. You met the Wumpus!", WHITE) 
                             draw.environment(ww.world)
-                            draw.arrows(ww.agent.facing, ww.agent.location, ww.world)
                             over()
                         elif 2 <= stats < 5:
                             draw.status(" Game over. You fall into the pit!", WHITE) 
@@ -134,6 +133,9 @@ def wumpus_world():
                                 draw.environment(ww.world)
                                 draw.agent(ww.cur_row, ww.cur_col, 'V')  
                                 over()
+                        elif stats == 10:
+                            draw.arrows(ww.agent.facing, ww.agent.location, ww.world)
+                            ww.agent.w_found = False
                         else:
                             continue
                         pg.display.update()
