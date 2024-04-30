@@ -73,7 +73,7 @@ class WumpusWorld:
         self.perceive_agent(x, y)
         self.agent.clear_safe()  
         print("AFTER CLEARING")      
-        func.print_world(self.agent.inference)
+        func.print_world(self.agent.kb.inference)
         self.locate_agent()
         self.world = func.assign_char(x, y, 'A', self.world)
         self.agent.score -= 1
@@ -127,9 +127,8 @@ class Agent:
         self.facing = 'S'
         self.score = 1000
         self.kb = Knowledge()
-        self.inference = [[''] * 4 for _ in range(4)] 
-        self.prev_moves = [] 
         self.count_loop = 0
+        self.prev_moves = [] 
 
 
     def perceive(self, percept):
@@ -161,13 +160,12 @@ class Agent:
             if safety == -1:
                 continue
             else:
-                #if safety == 1: self.clear_safe()
+    
                 for i in range(len(self.prev_moves) - 2):
                     if (x, y) == self.prev_moves[i]:
-                        print(i)
-                        print("Current move is the same as a move made two steps ago.")
+                        # print("Current move is the same as a move made two steps ago.")
                         self.count_loop += 1
-                        print("self.count_loop", self.count_loop)
+                        #print("self.count_loop", self.count_loop)
                 
                     if self.count_loop == 3:
                         self.prev_moves = []
@@ -175,8 +173,8 @@ class Agent:
                         valid_adj_cells.remove((x, y))
                         return random.choice(valid_adj_cells)
                         
-                print("Current move:", (x, y))
-                print("Previous moves:", self.prev_moves)
+                # print("Current move:", (x, y))
+                # print("Previous moves:", self.prev_moves)
                 
                 self.prev_moves.append((x, y))
                 return x, y
@@ -220,11 +218,14 @@ class Agent:
                     if func.is_valid(adj_row, adj_col):
                         prediction = predict.get(key)
                         if key == "Glitter":
-                            self.inference = func.assign_char(row, col, prediction, self.inference)
+                            self.kb.inference = func.assign_char(row, col, prediction, self.kb.inference)
                         else:
-                            self.inference = func.assign_char(adj_row, adj_col, prediction, self.inference)
+                            self.kb.inference = func.assign_char(adj_row, adj_col, prediction, self.kb.inference)
 
-        func.print_world(self.inference)
+        func.print_world(self.kb.inference)
+        self.predict()
+        print('AFTER INFER THEN PREDICT')
+        func.print_world(self.kb.inference)
 
     def grab(self, x, y, world):
         world = func.remove_char(x, y, 'G', world[:])
@@ -233,7 +234,7 @@ class Agent:
 
     def predict(self):
         possible_pos = func.generate_patterns()
-
+        predict = { 'Stench': 'W', 'Breeze': 'P', 'Glitter': 'G'}
         # CAN BE USE FOR CHECKING 
         # BETTER IF 3 MATCH THE POSSIBLE POS
         # CONSIDER THE NUMBER OF PITS AND WUMPUS 
@@ -241,18 +242,19 @@ class Agent:
         for i in range(WORLD_SIZE):
             for j in range(WORLD_SIZE):
                 for key, value in self.kb.world_info[i][j].items():
-                    if value:  # No need to check if value == True
+                    if value:
+                        prediction = predict.get(key)
+                        if key == "Glitter":
+                            self.kb.inference = func.assign_char(i, j, prediction, self.kb.inference)
                         for pattern in possible_pos:
                             if all(self.kb.world_info[coord[0]][coord[1]].get(key) for coord in pattern["pattern"]):
-                                    row, col = pattern["location"]
-                                    print("Pattern:", pattern["pattern"], "Location:", pattern["location"])
-                                    if key == "Stench":
-                                        self.inference = func.assign_char(row, col, 'W', self.inference)
-                                    elif key == "Breeze":
-                                        self.inference = func.assign_char(row, col, 'P', self.inference)
-                                    print(self.inference)
+                                row, col = pattern["location"]
+                                print("Pattern:", pattern["pattern"], "Location:", pattern["location"])
+                                self.kb.inference = func.assign_char(row, col, prediction, self.kb.inference)
+                            
+        print(self.kb.inference)
         #self.clear_safe()                                
-        #func.print_world(self.inference) 
+        #func.print_world(self.kb.inference) 
 
     def clear_safe(self):
 
@@ -260,7 +262,7 @@ class Agent:
             for y in range(WORLD_SIZE):
                 if self.kb.world_info[x][y]:
                     if all(value is None for value in self.kb.world_info[x][y].values()):
-                        self.inference[x][y] = ''
+                        self.kb.inference[x][y] = ''
                 else:
                     pass
         
@@ -271,6 +273,8 @@ class Agent:
 class Knowledge:
     def __init__(self):
         self.world_info = [[{} for _ in range(4)] for _ in range(4)]
+        self.inference = [[''] * 4 for _ in range(4)] 
+
 
     def add(self, pos, sensors):
         self.world_info[pos[0]][pos[1]] = sensors.copy()
