@@ -64,7 +64,8 @@ def wumpus_world():
     ww.prepare_environment()
     
     game_bg = pg.image.load("assets/game-bg.png")
-    screen.blit(game_bg, (0,0))    
+    screen.blit(game_bg, (0,0)) 
+    grabbed = killed = False   
     while True:
         
         MOUSE_POS = pg.mouse.get_pos()
@@ -109,35 +110,43 @@ def wumpus_world():
                                 
                         
                         stats = ww.game_status()
+                        print("STATs:", stats)
                         if stats == -1:
                             draw.status("Game is ongoing!", LIGHT_GREEN)            
-                        elif stats == 0:
-                            draw.status(" You found the  golden treasure!", WHITE)                             
+                        elif stats == 0 and not grabbed:
+                            draw.status(" You found the  golden treasure!", WHITE)                  
                             ww.world = ww.agent.grab(ww.cur_row, ww.cur_col, ww.world)
                             draw.agent(ww.cur_row, ww.cur_col, ww.agent.facing)  
                             #draw.fill_env(ww.cur_row, ww.cur_col, ww.world)  
                             ww.g_w_p_coords[0] = None
                             pg.display.update()
+                            grabbed = True
                         elif stats == 1:
                             draw.status(" Game over. You met the Wumpus!", WHITE) 
                             draw.environment(ww.world)
                             over()
                         elif 2 <= stats < 5:
                             draw.status(" Game over. You fall into the pit!", WHITE) 
-                            
                             draw.environment(ww.world)
                             over()
-                        elif stats == 9:
-                            if ww.agent.location == (0, 0):
-                                draw.status("   Agent win!   Congratulations!", WHITE) 
-                                draw.environment(ww.world)
-                                draw.agent(ww.cur_row, ww.cur_col, 'V')  
-                                over()
-                        elif stats == 10:
+                        elif stats == 9 and ww.agent.location == (0, 0):
+                            draw.status("   Agent win!   Congratulations!", WHITE) 
+                            draw.environment(ww.world)
+                            draw.agent(ww.cur_row, ww.cur_col, 'V')  
+                            over()
+                        elif stats == 10 and not killed:
+                            draw.fill_env(ww.agent.w_pos[0], ww.agent.w_pos[1], ww.world)  
                             draw.arrows(ww.agent.facing, ww.agent.location, ww.world)
                             ww.agent.w_found = False
+                            ww.g_w_p_coords[1] = None
+                            draw.status(" Wumpus scream! You killed Wumpus.", WHITE)  
+                            pg.display.update()
+                            killed = True   
+                        elif grabbed and killed:
+                            draw.status(" Treasure found and Wumpus killed!", AQUA) 
                         else:
-                            continue
+                            draw.status("Game is ongoing!", LIGHT_GREEN)         
+
                         pg.display.update()
                         
             

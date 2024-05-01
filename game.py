@@ -32,6 +32,10 @@ class WumpusWorld:
             y = random.randint(0, 3)
             if x == 0 and y == 0:
                 continue
+            elif x == 0 and y == 1:
+                continue
+            elif x == 1 and y == 0:
+                continue
             coordinates.add((x, y))
         return list(coordinates)
     
@@ -216,12 +220,10 @@ class Agent:
         valid_adj_cells = [(x, y) for x, y in adj_cells if func.is_valid(x, y)]        
         valid_adj_cells.sort(key=lambda cell: abs(cell[0] - 0) + abs(cell[1] - 0))
 
-        print("CELL NEAR 00:", valid_adj_cells)
         for x, y in valid_adj_cells:
             safety = self.is_move_safe(x, y)
             
-            if safety == 0 and self.predict_unsafe(x, y):   # agent doesn't have knowledge about that cell  
-                print('NO KNOWLEDGE and unsafe')            # then it will check the move based on the prediction made from the hints
+            if safety == 0 and self.predict_unsafe(x, y):        
                 continue                             
             for i in range(len(self.prev_moves) - 2):
                 if (x, y) == self.prev_moves[i]:
@@ -297,7 +299,10 @@ class Agent:
                                 self.kb.inference = func.assign_char(row, col, prediction, self.kb.inference)
                                 if key == "Stench":
                                     self.wumpus_located(row, col, True)
-                                    print()
+                                    self.direction(row, col)
+                                    print("FACE AFTER STENCH: ", self.facing)
+                                    print(row, col)
+                                    #print()
                                 
                             
         print(self.kb.inference)
@@ -335,7 +340,7 @@ class Knowledge:
     def add(self, pos, sensors):
         self.world_info[pos[0]][pos[1]] = sensors.copy()
         print('pos:', pos)
-        self.print_world_info()
+        #self.print_world_info()
 
 
     def print_world_info(self):
