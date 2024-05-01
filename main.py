@@ -129,23 +129,28 @@ def wumpus_world():
                             draw.status(" Game over. You fall into the pit!", WHITE) 
                             draw.environment(ww.world)
                             over()
-                        elif stats == 9 and ww.agent.location == (0, 0):
-                            draw.status("   Agent win!   Congratulations!", WHITE) 
-                            draw.environment(ww.world)
-                            draw.agent(ww.cur_row, ww.cur_col, 'V')  
-                            over()
+                        elif stats == 9 and grabbed:
+                            if ww.agent.location == (0, 0):
+                                draw.status("   Agent win!   Congratulations!", WHITE) 
+                                draw.environment(ww.world)
+                                draw.agent(ww.cur_row, ww.cur_col, 'V')  
+                                over()
                         elif stats == 10 and not killed:
                             draw.fill_env(ww.agent.w_pos[0], ww.agent.w_pos[1], ww.world)  
-                            draw.arrows(ww.agent.facing, ww.agent.location, ww.world)
-                            ww.agent.w_found = False
-                            ww.g_w_p_coords[1] = None
-                            draw.status(" Wumpus scream! You killed Wumpus.", WHITE)  
+                            draw.arrows(ww.agent.facing, ww.agent.location)
+                            if ww.is_wumpus_killed(ww.agent.facing):
+                                ww.g_w_p_coords[1] = None
+                                draw.status(" Wumpus scream! You killed Wumpus.", WHITE)  
+                                killed = True 
+                            else:  
+                                ww.agent.w_found = False
+                                draw.status("WUMPUS NOT KILLED!", LIGHT_GREEN)   
                             pg.display.update()
-                            killed = True   
                         elif grabbed and killed:
                             draw.status(" Treasure found and Wumpus killed!", AQUA) 
                         else:
-                            draw.status("Game is ongoing!", LIGHT_GREEN)         
+                            pass
+                            #draw.status(f"STATS: {stats}, FOUND & KILLED", AQUA)         
 
                         pg.display.update()
                         

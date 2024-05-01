@@ -108,19 +108,38 @@ class WumpusWorld:
         
 
     def game_status(self):
-        #print(self.g_w_p_coords[1:])
-        if self.agent.has_gold:
-            return 9
-        elif self.agent.w_found:
-            return 10
+        for i, pos in enumerate(self.g_w_p_coords):
+            if self.agent.location == pos:
+                # print("self.agent.location:", self.agent.location)
+                # print("pos:", pos)
+                #print("GAME OVER")
+                return i
         else:
-            for i, pos in enumerate(self.g_w_p_coords):
-                if self.agent.location == pos:
-                    # print("self.agent.location:", self.agent.location)
-                    # print("pos:", pos)
-                    #print("GAME OVER")
-                    return i
-            return -1
+            if self.agent.has_gold:
+                return 9
+            elif self.agent.w_found:
+                return 10
+            
+        return -1
+        
+    def is_wumpus_killed(self, direction):
+        wumpus_x, wumpus_y = self.g_w_p_coords[1]
+        if direction == 'N' or direction == 'S':
+            for col in range(WORLD_SIZE):
+                if col == wumpus_y:
+                    print("wumpus_y", wumpus_y)
+                    self.world = func.remove_char(wumpus_x, col, 'W', self.world[:])
+                    return True
+        elif direction == 'E' or direction == 'W':
+            for row in range(WORLD_SIZE):
+                if row == wumpus_x:
+                    print("wumpus_x", wumpus_x)
+                    self.world = func.remove_char(row, wumpus_y, 'W', self.world[:])
+                    return True
+        else:
+            print("NOT KILLED wumpus_xy", wumpus_x, wumpus_y)
+            print("direction", direction)
+            return False
     
 
 class Agent:
@@ -284,7 +303,7 @@ class Agent:
         # CAN BE USE FOR CHECKING 
         # BETTER IF 3 MATCH THE POSSIBLE POS
         # CONSIDER THE NUMBER OF PITS AND WUMPUS 
-        
+        checked_stench = False
         for i in range(WORLD_SIZE):
             for j in range(WORLD_SIZE):
                 for key, value in self.kb.world_info[i][j].items():
@@ -298,16 +317,31 @@ class Agent:
                                 #print("Pattern:", pattern["pattern"], "Location:", pattern["location"])
                                 self.kb.inference = func.assign_char(row, col, prediction, self.kb.inference)
                                 if key == "Stench":
-                                    self.wumpus_located(row, col, True)
-                                    self.direction(row, col)
-                                    print("FACE AFTER STENCH: ", self.facing)
-                                    print(row, col)
-                                    #print()
-                                
+                                    if checked_stench:
+                                        self.check_stench_pattern(pattern)  
+                                    else:        
+                                        self.wumpus_located(row, col, True)
+                                        self.direction(1, 1) if pattern["location"] == (0, 0) else self.direction(row, col) 
+                                        print("FACE AFTER STENCH: ", self.facing)
+                                        print(row, col)
+                                        checked_stench = True
                             
         print(self.kb.inference)
         #self.clear_safe()                                
         #func.print_world(self.kb.inference) 
+
+    def check_stench_pattern(self, pattern):
+        if len(pattern["pattern"]) == 3:
+            print("CHECK 3 PATTERNS")
+            if all(self.kb.world_info[coord[0]][coord[1]].get("Stench") for coord in pattern["pattern"]):                
+                row, col = pattern["location"]
+                self.wumpus_located(row, col, True)
+                self.direction(row, col)
+                print("FACE AFTER 3 PATTS: ", self.facing)
+                print(row, col)
+            #return True
+        print("NOCHECK 3")
+        #return False
 
     def clear_safe(self):
         for x in range(WORLD_SIZE):

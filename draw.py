@@ -100,7 +100,7 @@ class Draw:
             
 
 
-    def arrows(self, direction, pos, world):
+    def arrows(self, direction, pos):
         row, col = pos
 
         x = mg_x + col * space +10
@@ -111,9 +111,7 @@ class Draw:
                 self.screen.blit(self.arrow_img, (x, y))
         elif direction == "S":
             for r in range(row, 4):
-                #prev_y = y
                 y = mg_y + r * space +10
-                #self.fill_env(prev_y, x, world)
                 arrow_down = pg.transform.flip(self.arrow_img, False, True)
                 self.screen.blit(arrow_down, (x, y))
         elif direction == "W":
