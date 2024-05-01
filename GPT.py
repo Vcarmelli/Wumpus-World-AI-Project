@@ -1,54 +1,35 @@
-from itertools import combinations
-
 WORLD_SIZE = 4
 
-def print_grid_with_pattern(grid, pattern):
-    for i, row in enumerate(grid):
-        for j, cell in enumerate(row):
-            if (i, j) in pattern:
-                print(f'[{cell}]', end=' ')
-            else:
-                print(cell, end=' ')
-        print()
+class WumpusWorld:
+    def __init__(self):
+        pass
 
-def print_patterns_with_grid(grid, patterns):
-    print("Grid with Patterns:")
-    for idx, pattern in enumerate(patterns, 1):
-        print(f"Pattern {idx}:")
-        print_grid_with_pattern(grid, pattern)  # Pass pattern here instead of coord
-        print()
+    def check_row_column(self, agent_pos, wumpus_pos, row_col):
+        agent_x, agent_y = agent_pos
+        for i in range(WORLD_SIZE):
+            if row_col == 'C':
+                if i == wumpus_pos[0]:
+                    print("Checking column:", i)
+                    if agent_x == wumpus_pos[0]:
+                        print("COLUMN:", i, wumpus_pos[0])
+                        return True
+            elif row_col == 'R':
+                if i == wumpus_pos[1]:
+                    print("Checking row:", i)
+                    if agent_y == wumpus_pos[1]:
+                        print("ROW:", i, wumpus_pos[1])
+                        return True
+        return False
 
-def get_adjacent(x, y):
-    adjacent_coords = [
-        (x, y + 1),  # Right
-        (x, y - 1),  # Left
-        (x + 1, y),  # Down
-        (x - 1, y),  # Up
-    ]
-    
-    # Filter out coordinates outside the grid
-    adjacent_coords = [(x, y) for x, y in adjacent_coords if 0 <= x <= WORLD_SIZE and 0 <= y <= WORLD_SIZE]
-    
-    return [list(comb) for comb in combinations(adjacent_coords, 3)]
 
-grid = [
-    ['S', 'S', 'S', 'S'],
-    ['S', 'S', 'S', 'S'],
-    ['S', 'S', 'S', 'S'],
-    ['S', 'S', 'S', 'S']
-]
-
-patterns_for_grid = []
-
-# Generate patterns for each cell in the grid
-for i in range(-1, WORLD_SIZE+1):
-    for j in range(-1, WORLD_SIZE+1):
-        patterns_for_cell = get_adjacent(i, j)
-        patterns_for_grid.append(patterns_for_cell)
-
-# Print the grid with its corresponding patterns
-
-patterns_for_grid = [pattern for patterns in patterns_for_grid for pattern in patterns]
-print(patterns_for_grid)
-print_patterns_with_grid(grid, patterns_for_grid)
-
+# Test scenario
+if __name__ == "__main__":
+    wumpus_world = WumpusWorld()
+    agent_position = (2, 3)
+    wumpus_position = (0, 3)
+    print("Agent position:", agent_position)
+    print("Wumpus position:", wumpus_position)
+    print("same row:")
+    print(wumpus_world.check_row_column(agent_position, wumpus_position, 'R'))
+    print("same column:")
+    print(wumpus_world.check_row_column(agent_position, wumpus_position, 'C'))

@@ -123,23 +123,23 @@ class WumpusWorld:
         return -1
         
     def is_wumpus_killed(self, direction):
-        wumpus_x, wumpus_y = self.g_w_p_coords[1]
+        #self.agent.direction(self.agent.w_pos[0], self.agent.w_pos[1])
+        wumpus_xy = self.g_w_p_coords[1]
+
         if direction == 'N' or direction == 'S':
-            for col in range(WORLD_SIZE):
-                if col == wumpus_y:
-                    print("wumpus_y", wumpus_y)
-                    self.world = func.remove_char(wumpus_x, col, 'W', self.world[:])
-                    return True
+            if func.check_row_column(self.agent.location, wumpus_xy, 'C'):
+                self.world = func.remove_char(wumpus_xy[0], wumpus_xy[1], 'W', self.world[:])
+                print("KILLED ", wumpus_xy)
+                return True
         elif direction == 'E' or direction == 'W':
-            for row in range(WORLD_SIZE):
-                if row == wumpus_x:
-                    print("wumpus_x", wumpus_x)
-                    self.world = func.remove_char(row, wumpus_y, 'W', self.world[:])
-                    return True
-        else:
-            print("NOT KILLED wumpus_xy", wumpus_x, wumpus_y)
-            print("direction", direction)
-            return False
+            if func.check_row_column(self.agent.location, wumpus_xy, 'R'):
+                self.world = func.remove_char(wumpus_xy[0], wumpus_xy[1], 'W', self.world[:])
+                print("KILLED ", wumpus_xy)
+                return True
+
+        print("NOT KILLED wumpus_xy", wumpus_xy)
+        print("direction", self.agent.facing)
+        return False
     
 
 class Agent:
@@ -206,7 +206,7 @@ class Agent:
                     self.count_loop += 1
                     #print("self.count_loop", self.count_loop)
             
-                if self.count_loop == 3:
+                if self.count_loop == 2:
                     self.prev_moves = []
                     self.count_loop = 0
                     valid_adj_cells.remove((x, y))
@@ -247,7 +247,7 @@ class Agent:
             for i in range(len(self.prev_moves) - 2):
                 if (x, y) == self.prev_moves[i]:
                     self.count_loop += 1
-                if self.count_loop == 3:
+                if self.count_loop == 2:
                     self.prev_moves = []
                     self.count_loop = 0
                     valid_adj_cells.remove((x, y))
@@ -303,7 +303,7 @@ class Agent:
         # CAN BE USE FOR CHECKING 
         # BETTER IF 3 MATCH THE POSSIBLE POS
         # CONSIDER THE NUMBER OF PITS AND WUMPUS 
-        checked_stench = False
+        checked_stench = True
         for i in range(WORLD_SIZE):
             for j in range(WORLD_SIZE):
                 for key, value in self.kb.world_info[i][j].items():
@@ -317,14 +317,15 @@ class Agent:
                                 #print("Pattern:", pattern["pattern"], "Location:", pattern["location"])
                                 self.kb.inference = func.assign_char(row, col, prediction, self.kb.inference)
                                 if key == "Stench":
-                                    if checked_stench:
-                                        self.check_stench_pattern(pattern)  
-                                    else:        
+                                    if self.check_stench_pattern(pattern):
+                                        #self.check_stench_pattern(pattern)  
+                                        checked_stench = False
+                                    if checked_stench:        
                                         self.wumpus_located(row, col, True)
                                         self.direction(1, 1) if pattern["location"] == (0, 0) else self.direction(row, col) 
                                         print("FACE AFTER STENCH: ", self.facing)
-                                        print(row, col)
-                                        checked_stench = True
+                                        print("pattern['location']", pattern["location"])
+                                        checked_stench = False
                             
         print(self.kb.inference)
         #self.clear_safe()                                

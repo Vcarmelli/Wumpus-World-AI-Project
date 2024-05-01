@@ -4,6 +4,23 @@ class Helper:
     def is_valid(self, x, y):
         return 0 <= x < WORLD_SIZE and 0 <= y < WORLD_SIZE
     
+    def check_row_column(self, agent_pos, wumpus_pos, row_col):
+        agent_x, agent_y = agent_pos
+        for i in range(WORLD_SIZE):
+            if row_col == 'C':
+                if i == wumpus_pos[0]:
+                    print("Checking column:", i)
+                    if agent_x == wumpus_pos[0]:
+                        print("COLUMN:", i, wumpus_pos[0])
+                        return True
+            elif row_col == 'R':
+                if i == wumpus_pos[1]:
+                    print("Checking row:", i)
+                    if agent_y == wumpus_pos[1]:
+                        print("ROW:", i, wumpus_pos[1])
+                        return True
+        return False
+    
     def get_adjacent(self, x, y):
         return [(x, y + 1), (x, y - 1), (x + 1, y), (x - 1, y)]
 

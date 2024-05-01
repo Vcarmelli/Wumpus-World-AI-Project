@@ -138,6 +138,7 @@ def wumpus_world():
                         elif stats == 10 and not killed:
                             draw.fill_env(ww.agent.w_pos[0], ww.agent.w_pos[1], ww.world)  
                             draw.arrows(ww.agent.facing, ww.agent.location)
+                            ww.agent.score -= 10
                             if ww.is_wumpus_killed(ww.agent.facing):
                                 ww.g_w_p_coords[1] = None
                                 draw.status(" Wumpus scream! You killed Wumpus.", WHITE)  
