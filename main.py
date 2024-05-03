@@ -59,7 +59,7 @@ def over():
                         wumpus_world()
 
                     if btn_back.click_button(MOUSE_POS):
-                        main()
+                        main() 
 
         draw.board()
         pg.display.flip()
