@@ -1,4 +1,4 @@
-# Wumpus World Game (Space Edition)
+# ✨Wumpus World Game (Space Edition)
 
 Welcome to the Wumpus Game Space Edition! Explore the depths of space in this adaptation of the classic Wumpus World game.
 
@@ -23,10 +23,10 @@ Welcome to the Wumpus Game Space Edition! Explore the depths of space in this ad
 
 
 4. **Scoring System**:
-    - Moving: -1 point per move
-    - Use of arrows: -10 points
-    - Retrieving gold: +1000 points
-    - Killing a Wumpus: +1000 points
+    - **`Moving`**: -1 point per move
+    - **`Use of arrows`**: -10 points
+    - **`Retrieving gold`**: +1000 points
+    - **`Killing a Wumpus`**: +1000 points
   
    
 5. **Winning Condition**:
@@ -37,7 +37,7 @@ Welcome to the Wumpus Game Space Edition! Explore the depths of space in this ad
 Here are some screenshots of the game:
 
 ### Title Screen
-![Title Screen](screenshots/game-1.png)
+![Title Screen](screenshots/title-screen.png)
 
 ### Game Description
 ![Game Description](screenshots/game-description.png)
@@ -59,7 +59,7 @@ Here are some screenshots of the game:
 
 ## How to Run
 
-1. Clone this repository.
+1. Clone this repository. ```bash https://github.com/Vcarmelli/wumpus-world.git ```
 2. Navigate to the directory containing the game files.
 3. Run the following command:
 
@@ -68,3 +68,9 @@ python main.py
 ```
 
 Enjoy the adventure in the Wumpus World!
+
+---
+
+<div align="center">
+  <h6>Machine Problem 5 by Vashti Karmelli V. Camu</h6>
+</div> 
