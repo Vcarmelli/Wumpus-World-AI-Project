@@ -46,12 +46,15 @@ Here are some screenshots of the game:
 
 #### Ending Phases
 **Fall into Pit**
+
 ![Fall into Pit](screenshots/game-pit.png)
 
-Eaten by Wumpus
+**Eaten by Wumpus**
+
 ![Eaten by Wumpus](screenshots/game-wumpus.png)
 
 **Retreiving Gold**
+
 ![Winning Phase](screenshots/game-2.png)
 
 
