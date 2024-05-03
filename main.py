@@ -70,6 +70,7 @@ def wumpus_world():
     global lost
     global win
     global total_games
+    arrows_count = 3
     grabbed = killed = False   
 
     draw = Draw(screen)
@@ -157,17 +158,19 @@ def wumpus_world():
                                 total_games += 1
                                 over()
                         elif stats == 10:
-                            
-                            if ww.is_wumpus_killed(ww.agent.facing):
-                                ww.g_w_p_coords[1] = None
-                                draw.status(" Wumpus scream! You killed Wumpus.", WHITE)  
-                                ww.agent.score += 2000
-                            else:  
-                                draw.status("WUMPUS NOT KILLED!", LIGHT_GREEN)   
+                            if arrows_count != 0:
+                                draw.fill_env(ww.agent.w_pos[0], ww.agent.w_pos[1], ww.world)  
+                                draw.arrows(ww.agent.facing, ww.agent.location)
+                                ww.agent.score -= 10
 
-                            draw.fill_env(ww.agent.w_pos[0], ww.agent.w_pos[1], ww.world)  
-                            draw.arrows(ww.agent.facing, ww.agent.location)
-                            ww.agent.score -= 10
+                                if ww.is_wumpus_killed(ww.agent.facing):
+                                    ww.g_w_p_coords[1] = None
+                                    draw.status(" Wumpus scream! You killed Wumpus.", WHITE)  
+                                    ww.agent.score += 2000
+                                else:  
+                                    draw.status("WUMPUS NOT KILLED!", LIGHT_GREEN)   
+
+                                arrows_count -= 1
                             ww.agent.w_found = False
                             pg.display.update()
                         elif grabbed and killed:

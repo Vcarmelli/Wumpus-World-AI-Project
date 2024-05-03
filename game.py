@@ -293,7 +293,6 @@ class Agent:
         return world
 
     def predict(self):
-        possible_pos = func.generate_patterns()
         predict = { 'Stench': 'W', 'Breeze': 'P', 'Glitter': 'G'}
 
         checked_stench = True
@@ -304,7 +303,7 @@ class Agent:
                         prediction = predict.get(key)
                         if key == "Glitter":
                             self.kb.inference = func.assign_char(i, j, prediction, self.kb.inference)
-                        for pattern in possible_pos:
+                        for pattern in self.kb.possible_pos:
                             if all(self.kb.world_info[coord[0]][coord[1]].get(key) for coord in pattern["pattern"]):
                                 row, col = pattern["location"]
                                 self.kb.inference = func.assign_char(row, col, prediction, self.kb.inference)
@@ -316,7 +315,8 @@ class Agent:
                                         self.direction(1, 1) if pattern["location"] == (0, 0) else self.direction(row, col) 
                                         print("FACE AFTER STENCH: ", self.facing)
                                         print("pattern['location']", pattern["location"])
-                                        possible_pos.remove(pattern)
+                                        self.kb.possible_pos.remove(pattern)
+                                        print("Pattern removed:", pattern)
                                         checked_stench = False
 
 
@@ -358,6 +358,7 @@ class Agent:
 
 class Knowledge:
     def __init__(self):
+        self.possible_pos = func.generate_patterns()
         self.world_info = [[{} for _ in range(4)] for _ in range(4)]
         self.inference = [[''] * 4 for _ in range(4)] 
 
