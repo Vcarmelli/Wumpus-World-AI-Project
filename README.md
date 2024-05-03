@@ -5,9 +5,7 @@ Welcome to the Wumpus Game Space Edition! Explore the depths of space in this ad
 
 ## How to Play
 
-
 1. **Objective**: The mission is to navigate the treacherous space caverns, locate the golden treasure, and avoid dangerous hazards lurking in the darkness of space. 
-
    
 2. **Symbols**:
    
@@ -46,12 +44,16 @@ Here are some screenshots of the game:
 #### Starting Phase
 ![Starting Phase](screenshots/game-1.png)
 
-#### Ending Phase
+#### Ending Phases
+**Fall into Pit**
 ![Fall into Pit](screenshots/game-pit.png)
 
+Eaten by Wumpus
 ![Eaten by Wumpus](screenshots/game-wumpus.png)
 
+**Retreiving Gold**
 ![Winning Phase](screenshots/game-2.png)
+
 
 ## Dependencies
 - Python 3.11
@@ -59,7 +61,7 @@ Here are some screenshots of the game:
 
 ## How to Run
 
-1. Clone this repository. ```bash https://github.com/Vcarmelli/wumpus-world.git ```
+1. Clone this repository.  ` https://github.com/Vcarmelli/wumpus-world.git  `
 2. Navigate to the directory containing the game files.
 3. Run the following command:
 
@@ -69,7 +71,9 @@ python main.py
 
 Enjoy the adventure in the Wumpus World!
 
+
 ---
+
 
 <div align="center">
   <h6>Machine Problem 5 by Vashti Karmelli V. Camu</h6>
