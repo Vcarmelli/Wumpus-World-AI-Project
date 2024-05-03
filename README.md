@@ -24,7 +24,7 @@ Welcome to the Wumpus Game Space Edition! Explore the depths of space in this ad
     - **`Moving`**: -1 point per move
     - **`Use of arrows`**: -10 points
     - **`Retrieving gold`**: +1000 points
-    - **`Killing a Wumpus`**: +1000 points
+    - **`Killing a Wumpus`**: +2000 points
   
    
 5. **Winning Condition**:
@@ -72,7 +72,7 @@ Here are some screenshots of the game:
 python main.py
 ```
 
-Enjoy the adventure in the Wumpus World!
+_Enjoy the adventure in the Wumpus World!_
 
 
 ---
