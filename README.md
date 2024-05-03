@@ -55,7 +55,7 @@ Here are some screenshots of the game:
 
 **Retreiving Gold**
 
-![Winning Phase](screenshots/game-2.png)
+![Winning Phase](screenshots/wumpus-world.gif)
 
 
 ## Dependencies
