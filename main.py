@@ -6,6 +6,14 @@ from game import WumpusWorld
 
 pg.init()
 
+global lost
+global win
+global total_games
+
+lost = 0
+win = 0
+total_games = 0
+
 space = 85
 
 AQUA = (49, 255, 255)
@@ -59,13 +67,19 @@ def over():
 def wumpus_world():
     pg.event.clear()
 
+    global lost
+    global win
+    global total_games
+    grabbed = killed = False   
+
     draw = Draw(screen)
     ww = WumpusWorld()
     ww.prepare_environment()
     
     game_bg = pg.image.load("assets/game-bg.png")
     screen.blit(game_bg, (0,0)) 
-    grabbed = killed = False   
+    rate = winning_rate_to_lose()
+    draw.text(f"AI Win Rate: {rate}%")
     while True:
         
         MOUSE_POS = pg.mouse.get_pos()
@@ -110,7 +124,7 @@ def wumpus_world():
                                 
                         
                         stats = ww.game_status()
-                        print("STATs:", stats)
+                        print("STATS:", stats)
                         if stats == -1:
                             draw.status("Game is ongoing!", LIGHT_GREEN)            
                         elif stats == 0 and not grabbed:
@@ -119,33 +133,40 @@ def wumpus_world():
                             draw.agent(ww.cur_row, ww.cur_col, ww.agent.facing)  
                             #draw.fill_env(ww.cur_row, ww.cur_col, ww.world)  
                             ww.g_w_p_coords[0] = None
+                            print("GWP:", ww.g_w_p_coords)
                             pg.display.update()
                             grabbed = True
                         elif stats == 1:
                             draw.status(" Game over. You met the Wumpus!", WHITE) 
                             draw.environment(ww.world)
+                            lost += 1
+                            total_games += 1
                             over()
                         elif 2 <= stats < 5:
                             draw.status(" Game over. You fall into the pit!", WHITE) 
                             draw.environment(ww.world)
+                            lost += 1
+                            total_games += 1
                             over()
                         elif stats == 9 and grabbed:
                             if ww.agent.location == (0, 0):
                                 draw.status("   Agent win!   Congratulations!", WHITE) 
                                 draw.environment(ww.world)
                                 draw.agent(ww.cur_row, ww.cur_col, 'V')  
+                                win += 1
+                                total_games += 1
                                 over()
-                        elif stats == 10 and not killed:
+                        elif stats == 10:
                             draw.fill_env(ww.agent.w_pos[0], ww.agent.w_pos[1], ww.world)  
                             draw.arrows(ww.agent.facing, ww.agent.location)
                             ww.agent.score -= 10
                             if ww.is_wumpus_killed(ww.agent.facing):
                                 ww.g_w_p_coords[1] = None
                                 draw.status(" Wumpus scream! You killed Wumpus.", WHITE)  
-                                killed = True 
+                                ww.agent.score += 2000
                             else:  
-                                ww.agent.w_found = False
                                 draw.status("WUMPUS NOT KILLED!", LIGHT_GREEN)   
+                            ww.agent.w_found = False
                             pg.display.update()
                         elif grabbed and killed:
                             draw.status(" Treasure found and Wumpus killed!", AQUA) 
@@ -252,7 +273,18 @@ def main():
 
         pg.display.flip()
     
-    
+def winning_rate_to_lose():
+    global lost
+    global win
+    global total_games
+    print(total_games, lost, win)
+    # Calculate the winning rate
+    if total_games > 0:
+        winning_rate = ((total_games - lost) / total_games) * 100
+        return round(winning_rate, 2) 
+    else:
+        return 0.00  # Avoid division by zero error
+
 
 if __name__ == "__main__":
     main()

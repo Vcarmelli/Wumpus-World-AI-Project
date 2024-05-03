@@ -8,16 +8,18 @@ class Helper:
         agent_x, agent_y = agent_pos
         for i in range(WORLD_SIZE):
             if row_col == 'C':
-                if i == wumpus_pos[0]:
+                if i == wumpus_pos[1]:
                     print("Checking column:", i)
-                    if agent_x == wumpus_pos[0]:
-                        print("COLUMN:", i, wumpus_pos[0])
+                    print("Agent pos:", agent_pos)
+                    if agent_y == wumpus_pos[1]:
+                        print("COLUMN:", i, wumpus_pos[1])
                         return True
             elif row_col == 'R':
-                if i == wumpus_pos[1]:
+                if i == wumpus_pos[0]:
                     print("Checking row:", i)
-                    if agent_y == wumpus_pos[1]:
-                        print("ROW:", i, wumpus_pos[1])
+                    print("Agent pos:", agent_pos)
+                    if agent_x == wumpus_pos[0]:
+                        print("ROW:", i, wumpus_pos[0])
                         return True
         return False
     
