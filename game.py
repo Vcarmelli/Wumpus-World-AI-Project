@@ -74,11 +74,14 @@ class WumpusWorld:
         self.agent.reset_sensor()
 
         self.perceive_agent(x, y)
-        self.agent.clear_safe()     
+        self.agent.clear_safe()   
+        print("AGENT INFERENCE")  
         func.print_world(self.agent.kb.inference)
         self.locate_agent()
         self.world = func.assign_char(x, y, 'A', self.world)
         self.agent.score -= 1
+        print("WORLD")
+        func.print_world(self.world)
 
 
     def perceive_agent(self, x, y):
@@ -305,7 +308,7 @@ class Agent:
                             if all(self.kb.world_info[coord[0]][coord[1]].get(key) for coord in pattern["pattern"]):
                                 row, col = pattern["location"]
                                 self.kb.inference = func.assign_char(row, col, prediction, self.kb.inference)
-                                if key == "Stench" and not self.w_killed:
+                                if key == "Stench" and not self.w_found:
                                     if self.check_stench_pattern(pattern): 
                                         checked_stench = False
                                     if checked_stench:        
@@ -313,10 +316,12 @@ class Agent:
                                         self.direction(1, 1) if pattern["location"] == (0, 0) else self.direction(row, col) 
                                         print("FACE AFTER STENCH: ", self.facing)
                                         print("pattern['location']", pattern["location"])
+                                        possible_pos.remove(pattern)
                                         checked_stench = False
 
 
     def check_stench_pattern(self, pattern):
+    
         if len(pattern["pattern"]) == 3:
             print("CHECK 3 PATTERNS")
             if all(self.kb.world_info[coord[0]][coord[1]].get("Stench") for coord in pattern["pattern"]):                

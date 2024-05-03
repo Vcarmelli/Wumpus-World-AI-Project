@@ -79,7 +79,7 @@ def wumpus_world():
     game_bg = pg.image.load("assets/game-bg.png")
     screen.blit(game_bg, (0,0)) 
     rate = winning_rate_to_lose()
-    draw.text(f"AI Win Rate: {rate}%")
+    #draw.text(f"AI Win Rate: {rate}%")
     while True:
         
         MOUSE_POS = pg.mouse.get_pos()
@@ -157,15 +157,17 @@ def wumpus_world():
                                 total_games += 1
                                 over()
                         elif stats == 10:
-                            draw.fill_env(ww.agent.w_pos[0], ww.agent.w_pos[1], ww.world)  
-                            draw.arrows(ww.agent.facing, ww.agent.location)
-                            ww.agent.score -= 10
+                            
                             if ww.is_wumpus_killed(ww.agent.facing):
                                 ww.g_w_p_coords[1] = None
                                 draw.status(" Wumpus scream! You killed Wumpus.", WHITE)  
                                 ww.agent.score += 2000
                             else:  
                                 draw.status("WUMPUS NOT KILLED!", LIGHT_GREEN)   
+
+                            draw.fill_env(ww.agent.w_pos[0], ww.agent.w_pos[1], ww.world)  
+                            draw.arrows(ww.agent.facing, ww.agent.location)
+                            ww.agent.score -= 10
                             ww.agent.w_found = False
                             pg.display.update()
                         elif grabbed and killed:
