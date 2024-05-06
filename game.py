@@ -139,8 +139,8 @@ class WumpusWorld:
                 self.agent.perceive_scream(self.agent.location, 'R')
                 return True
 
-        print("Wumpus not killed:", wumpus_xy)
-        print("direction:", self.agent.facing)
+        # print("Wumpus not killed:", wumpus_xy)
+        # print("direction:", self.agent.facing)
         return False
     
 
@@ -241,7 +241,7 @@ class Agent:
             return 1
         elif any(key in ['Breeze', 'Stench'] and value for key, value in self.kb.world_info[x][y].items()): 
             true_values = [key for key, value in self.kb.world_info[x][y].items() if value is True]
-            print(f'There is a {true_values} in ({x}, {y})')
+            #print(f'There is a {true_values} in ({x}, {y})')
             return -1
         
     def back_to_init_move(self):

@@ -1,18 +1,14 @@
 import sys, pygame as pg
 import numpy as np
+import webbrowser
+import tkinter as tk
+from tkinter import ttk
+
 from button import Button
 from draw import Draw
 from game import WumpusWorld
 
-pg.init()
 
-global lost
-global win
-global total_games
-
-lost = 0
-win = 0
-total_games = 0
 
 space = 85
 
@@ -23,8 +19,11 @@ LIGHT_GREEN = (194, 203, 159)
 BLUE = (6, 61, 81)
 TRANSPARENT = (0, 0, 0, 255)
 
+HEIGHT = 550
+WIDTH = 780
 
-screen = pg.display.set_mode((780, 550))
+pg.init()
+screen = pg.display.set_mode((WIDTH, HEIGHT))
 pg.display.set_caption("Wumpus World (Space Edition) by VKVC")
 
 def generate_board():
@@ -52,14 +51,16 @@ def over():
 
         for event in pg.event.get():
             
-            if event.type == pg.QUIT: sys.exit()
+            if event.type == pg.QUIT: 
+                confirm_quit() 
+
             if event.type == pg.MOUSEBUTTONDOWN:
                     
-                    if btn_reset.click_button(MOUSE_POS):
-                        wumpus_world()
+                if btn_reset.click_button(MOUSE_POS):
+                    wumpus_world()
 
-                    if btn_back.click_button(MOUSE_POS):
-                        main() 
+                if btn_back.click_button(MOUSE_POS):
+                    main() 
 
         draw.board()
         pg.display.flip()
@@ -91,7 +92,8 @@ def wumpus_world():
         draw.fill_env(ww.cur_row, ww.cur_col, ww.world)        
         for event in pg.event.get():
             
-            if event.type == pg.QUIT: sys.exit()
+            if event.type == pg.QUIT: 
+                confirm_quit() 
 
             if event.type == pg.MOUSEBUTTONDOWN:
                 
@@ -190,7 +192,8 @@ def description():
 
         for event in pg.event.get():
             
-            if event.type == pg.QUIT: sys.exit()
+            if event.type == pg.QUIT: 
+                confirm_quit() 
 
             if event.type == pg.MOUSEBUTTONDOWN:
 
@@ -198,6 +201,48 @@ def description():
                     main()
         
         pg.display.flip()
+
+
+def confirm_quit():
+
+    def center_window(window):
+        window.update_idletasks()
+        width = window.winfo_width()
+        height = window.winfo_height()
+        x = (window.winfo_screenwidth() - width) // 2
+        y = (window.winfo_screenheight() - height) // 2
+        window.geometry('{}x{}+{}+{}'.format(width, height, x, y))
+
+    def open_repo_link():
+        webbrowser.open("https://github.com/Vcarmelli/wumpus-world.git")
+
+    def quit_game():
+        custom_dialog.destroy()
+        pg.quit()
+        sys.exit()
+
+    root = tk.Tk()
+    root.withdraw()
+    custom_dialog = tk.Toplevel(root, bg="white")
+    custom_dialog.title("Quit")
+
+    custom_style = ttk.Style()
+    custom_style.configure("Custom.TButton", borderwidth=0, relief="solid", border_radius=5, background="white")
+    
+    message_label = tk.Label(custom_dialog, text="Leaving the Wumpus World.\nIs it time to conquer new realms? 🚀", bg="white")
+    message_label.pack(padx=40, pady=20)
+
+    no_button = ttk.Button(custom_dialog, text="No", style="Custom.TButton", command=custom_dialog.destroy)
+    no_button.pack(side="right", padx=(5, 25), pady=15)
+    yes_button = ttk.Button(custom_dialog, text="Yes", style="Custom.TButton", command=quit_game)
+    yes_button.pack(side="right", padx=(25, 5), pady=15)
+    
+    repo_label = tk.Label(custom_dialog, text="Click here to explore the Git repository👋🏼", fg="blue", cursor="hand2", bg="white")
+    repo_label.pack(padx=10, pady=15)
+    repo_label.bind("<Button-1>", lambda event: open_repo_link())
+
+    center_window(custom_dialog)
+    root.wait_window(custom_dialog)
 
 
 
@@ -219,8 +264,9 @@ def main():
 
         for event in pg.event.get():
             
-            if event.type == pg.QUIT: sys.exit()
-
+            if event.type == pg.QUIT: 
+                confirm_quit() 
+                
             if event.type == pg.MOUSEBUTTONDOWN:
                 if start.click_button(MOUSE_POS):
                     wumpus_world()
