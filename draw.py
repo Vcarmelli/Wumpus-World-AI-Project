@@ -165,10 +165,6 @@ class Draw:
         self.screen.blit(score, text_rect1)
         self.screen.blit(output, text_rect2)
 
-    def text(self, text):
-        txt_font = pg.font.SysFont('Arial Black', 11)
-        output = txt_font.render(text, True, AQUA)
-        self.screen.blit(output, (70, 510))
 
 
 

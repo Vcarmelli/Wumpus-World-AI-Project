@@ -25,6 +25,9 @@ class Helper:
     
     def get_adjacent(self, x, y):
         return [(x, y + 1), (x, y - 1), (x + 1, y), (x - 1, y)]
+    
+    def is_boundary_cell(self, x, y):
+        return (x == 0 or x == 3 or y == 0 or y == 3)
 
     def assign_char(self, x, y, character, grid):
         if self.is_valid(x, y):
@@ -79,9 +82,6 @@ class Helper:
         for pattern in patterns_list:
             pattern["pattern"] = [coord for coord in pattern["pattern"] if self.is_valid(coord[0], coord[1])]
 
-        # for pattern in patterns_list:
-        #     print("Pattern:", pattern["pattern"], "Location:", pattern["location"])
-
         return patterns_list
     
     def print_world(self, world):    
@@ -93,40 +93,3 @@ class Helper:
                 print("|  ", end="")
             print()
             print("+" + "-" * 23 + "+")
-
-
-
-
-# h = Helper()
-
-# def print_grid_with_pattern(grid, pattern):
-#     for i, row in enumerate(grid):
-#         for j, cell in enumerate(row):
-#             if (i, j) in pattern:
-#                 print(f'[{cell}]', end=' ')
-#             else:
-#                 print(cell, end=' ')
-#         print()
-
-# def print_patterns_with_grid(grid, patterns):
-#     print("Grid with Patterns:")
-#     for idx, pattern in enumerate(patterns, 1):
-#         print(f"Pattern {idx}:")
-#         print_grid_with_pattern(grid, pattern)
-#         print()
-
-# # Example 4x4 grid
-# grid = [
-#     ['S', 'S', 'S', 'S'],
-#     ['S', 'S', 'S', 'S'],
-#     ['S', 'S', 'S', 'S'],
-#     ['S', 'S', 'S', 'S']
-# ]
-
-# # Generate patterns dynamically for a 4x4 grid
-# h.generate_patterns()
-
-# # Print each grid with its pattern
-# print_patterns_with_grid(grid, patterns)
-
-

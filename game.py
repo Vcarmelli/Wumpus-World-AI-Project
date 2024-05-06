@@ -80,7 +80,7 @@ class WumpusWorld:
         self.locate_agent()
         self.world = func.assign_char(x, y, 'A', self.world)
         self.agent.score -= 1
-        print("WORLD")
+        print("WORLD", self.world)
         func.print_world(self.world)
 
 
@@ -97,15 +97,18 @@ class WumpusWorld:
         if func.check_char(cell, 'S'):
             self.agent.perceive('Stench')
             perceived = True
-        if not func.is_valid(x, y):
+        if func.is_boundary_cell(x, y):
             self.agent.perceive('Bump')
             perceived = True
+        
 
         if not perceived:
             self.agent.perceive('No perceive')
 
         # WUMPUS DIED
         # Perceive scream
+
+
         
 
     def game_status(self):
@@ -121,7 +124,6 @@ class WumpusWorld:
         return -1
         
     def is_wumpus_killed(self, direction):
-        #self.agent.direction(self.agent.w_pos[0], self.agent.w_pos[1])
         wumpus_xy = self.g_w_p_coords[1]
 
         if direction == 'N' or direction == 'S':
@@ -129,12 +131,14 @@ class WumpusWorld:
                 self.world = func.remove_char(wumpus_xy[0], wumpus_xy[1], 'W', self.world[:])
                 print("KILLED ", wumpus_xy)
                 self.agent.w_killed = True
+                self.agent.perceive_scream(self.agent.location, 'C')
                 return True
         elif direction == 'E' or direction == 'W':
             if func.check_row_column(self.agent.location, wumpus_xy, 'R'):
                 self.world = func.remove_char(wumpus_xy[0], wumpus_xy[1], 'W', self.world[:])
                 print("KILLED ", wumpus_xy)
                 self.agent.w_killed = True
+                self.agent.perceive_scream(self.agent.location, 'C')
                 return True
 
         print("NOT KILLED wumpus_xy", wumpus_xy)
@@ -172,8 +176,24 @@ class Agent:
             self.sensor[percept] = True 
             
         self.kb.add(self.location, self.sensor)
-        #self.infer()
-        self.predict()
+        self.infer()
+
+    def perceive_scream(self, xy, row_col):
+        percept = "Scream"
+        if row_col == 'C': 
+            for j in range(WORLD_SIZE):
+                if percept in self.sensor:
+                    self.sensor[percept] = True 
+                    self.kb.add((xy[0], j), self.sensor)
+                print(self.kb.world_info[xy[0]][j]['Scream'])
+        elif row_col == 'R':  
+            for i in range(WORLD_SIZE):
+                if percept in self.sensor:
+                    self.sensor[percept] = True 
+                    self.kb.add((i, xy[1]), self.sensor)
+                print(self.kb.world_info[[i]][xy[1]]['Scream'])
+
+        self.kb.print_world_info()
     
 
     def reset_sensor(self):
@@ -192,7 +212,6 @@ class Agent:
         
         valid_adj_cells = [(x, y) for x, y in adj_cells if func.is_valid(x, y)]        
         random.shuffle(valid_adj_cells)
-        #print(valid_adj_cells)
         
         for x, y in valid_adj_cells:
             safety = self.is_move_safe(x, y)
@@ -265,26 +284,6 @@ class Agent:
         elif y == col + 1:
             self.facing = 'E'
 
-        
-    # def infer(self):
-    #     row, col = self.location
-    #     adjacent_cells = func.get_adjacent(row, col)
-    #     predict = { 'Stench': 'W', 'Breeze': 'P', 'Glitter': 'G'}
-
-    #     for key, value in self.kb.world_info[row][col].items():
-    #         if value == True:
-    #             for adj_row, adj_col in adjacent_cells:
-    #                 if func.is_valid(adj_row, adj_col):
-    #                     prediction = predict.get(key)
-    #                     if key == "Glitter":
-    #                         self.kb.inference = func.assign_char(row, col, prediction, self.kb.inference)
-    #                     else:
-    #                         self.kb.inference = func.assign_char(adj_row, adj_col, prediction, self.kb.inference)
-
-    #     func.print_world(self.kb.inference)
-    #     self.predict()
-    #     print('AFTER INFER THEN PREDICT')
-    #     func.print_world(self.kb.inference)
 
     def grab(self, x, y, world):
         world = func.remove_char(x, y, 'G', world[:])
@@ -292,36 +291,36 @@ class Agent:
         self.has_gold = True
         return world
 
-    def predict(self):
+    def infer(self):
         predict = { 'Stench': 'W', 'Breeze': 'P', 'Glitter': 'G'}
 
         checked_stench = True
         for i in range(WORLD_SIZE):
             for j in range(WORLD_SIZE):
                 for key, value in self.kb.world_info[i][j].items():
-                    if value:
-                        prediction = predict.get(key)
-                        if key == "Glitter":
-                            self.kb.inference = func.assign_char(i, j, prediction, self.kb.inference)
-                        for pattern in self.kb.possible_pos:
-                            if all(self.kb.world_info[coord[0]][coord[1]].get(key) for coord in pattern["pattern"]):
-                                row, col = pattern["location"]
-                                self.kb.inference = func.assign_char(row, col, prediction, self.kb.inference)
-                                if key == "Stench" and not self.w_found:
-                                    if self.check_stench_pattern(pattern): 
-                                        checked_stench = False
-                                    if checked_stench:        
-                                        self.wumpus_located(row, col, True)
-                                        self.direction(1, 1) if pattern["location"] == (0, 0) else self.direction(row, col) 
-                                        print("FACE AFTER STENCH: ", self.facing)
-                                        print("pattern['location']", pattern["location"])
-                                        self.kb.possible_pos.remove(pattern)
-                                        print("Pattern removed:", pattern)
-                                        checked_stench = False
+                    prediction = predict.get(key)
+                    if prediction and value:
+                            if key == "Glitter":
+                                self.kb.inference = func.assign_char(i, j, prediction, self.kb.inference)
+                            for pattern in self.kb.possible_pos:
+                                if all(self.kb.world_info[coord[0]][coord[1]].get(key) for coord in pattern["pattern"]):
+                                    row, col = pattern["location"]
+                                    print("infer kb: ", self.kb.inference)
+                                    self.kb.inference = func.assign_char(row, col, prediction, self.kb.inference)
+                                    if key == "Stench" and not self.w_found:
+                                        if self.check_stench_pattern(pattern): 
+                                            checked_stench = False
+                                        if checked_stench:        
+                                            self.wumpus_located(row, col, True)
+                                            self.direction(1, 1) if pattern["location"] == (0, 0) else self.direction(row, col) 
+                                            print("FACE AFTER STENCH: ", self.facing)
+                                            print("pattern['location']", pattern["location"])
+                                            self.kb.possible_pos.remove(pattern)
+                                            print("Pattern removed:", pattern)
+                                            checked_stench = False
 
 
     def check_stench_pattern(self, pattern):
-    
         if len(pattern["pattern"]) == 3:
             print("CHECK 3 PATTERNS")
             if all(self.kb.world_info[coord[0]][coord[1]].get("Stench") for coord in pattern["pattern"]):                
@@ -366,7 +365,7 @@ class Knowledge:
     def add(self, pos, sensors):
         self.world_info[pos[0]][pos[1]] = sensors.copy()
         print('pos:', pos)
-        #self.print_world_info()
+        self.print_world_info()
 
 
     def print_world_info(self):
@@ -387,20 +386,6 @@ class Knowledge:
             print("|")
         print("+" + "-" * 35 + "+" + "-" * 35 + "+"+ "-" * 35 + "+"+ "-" * 35 + "+")
     
-
-
-# if __name__ == '__main__':
-#     ww = WumpusWorld()
-#     ww.prepare_environment()
-
-#     while True:
-#         x, y = ww.agent.get_move()
-#         #print(f"COORDINATE: ({x}, {y})")
-        
-#         ww.move_agent(x, y)
-#         #ww.agent.is_move_safe(x, y)
-#         func.print_world(ww.world)
-#         input()
 
 
         

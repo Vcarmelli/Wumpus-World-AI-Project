@@ -67,9 +67,6 @@ def over():
 def wumpus_world():
     pg.event.clear()
 
-    global lost
-    global win
-    global total_games
     arrows_count = 3
     grabbed = killed = False   
 
@@ -79,8 +76,6 @@ def wumpus_world():
     
     game_bg = pg.image.load("assets/game-bg.png")
     screen.blit(game_bg, (0,0)) 
-    rate = winning_rate_to_lose()
-    #draw.text(f"AI Win Rate: {rate}%")
     while True:
         
         MOUSE_POS = pg.mouse.get_pos()
@@ -122,40 +117,30 @@ def wumpus_world():
                                 if ww.path[row][col]:
                                     draw.fill_env(row, col, ww.world)
                                 draw.agent(ww.cur_row, ww.cur_col, ww.agent.facing)  
-                                
                         
                         stats = ww.game_status()
-                        print("STATS:", stats)
                         if stats == -1:
                             draw.status("Game is ongoing!", LIGHT_GREEN)            
                         elif stats == 0 and not grabbed:
                             draw.status(" You found the  golden treasure!", WHITE)                  
                             ww.world = ww.agent.grab(ww.cur_row, ww.cur_col, ww.world)
-                            draw.agent(ww.cur_row, ww.cur_col, ww.agent.facing)  
-                            #draw.fill_env(ww.cur_row, ww.cur_col, ww.world)  
+                            draw.agent(ww.cur_row, ww.cur_col, ww.agent.facing)   
                             ww.g_w_p_coords[0] = None
-                            print("GWP:", ww.g_w_p_coords)
                             pg.display.update()
                             grabbed = True
                         elif stats == 1:
                             draw.status(" Game over. You met the Wumpus!", WHITE) 
                             draw.environment(ww.world)
-                            lost += 1
-                            total_games += 1
                             over()
                         elif 2 <= stats < 5:
                             draw.status(" Game over. You fall into the pit!", WHITE) 
                             draw.environment(ww.world)
-                            lost += 1
-                            total_games += 1
                             over()
                         elif stats == 9 and grabbed:
                             if ww.agent.location == (0, 0):
                                 draw.status("   Agent win!   Congratulations!", WHITE) 
                                 draw.environment(ww.world)
                                 draw.agent(ww.cur_row, ww.cur_col, 'V')  
-                                win += 1
-                                total_games += 1
                                 over()
                         elif stats == 10:
                             if arrows_count != 0:
@@ -167,57 +152,22 @@ def wumpus_world():
                                     ww.g_w_p_coords[1] = None
                                     draw.status(" Wumpus scream! You killed Wumpus.", WHITE)  
                                     ww.agent.score += 2000
-                                else:  
-                                    draw.status("WUMPUS NOT KILLED!", LIGHT_GREEN)   
-
                                 arrows_count -= 1
+
                             ww.agent.w_found = False
                             pg.display.update()
+
                         elif grabbed and killed:
                             draw.status(" Treasure found and Wumpus killed!", AQUA) 
                         else:
-                            pass
-                            #draw.status(f"STATS: {stats}, FOUND & KILLED", AQUA)         
+                            pass      
 
                         pg.display.update()
-                        
-            
-        #     if event.type == pg.KEYDOWN:
-        #         if event.key == pg.K_RIGHT:
-        #             if ww.cur_col < 3:
-        #                 ww.cur_col += 1
-        #                 draw.fill_env(ww.cur_row, ww.cur_col, ww.world)  
-        #                 ww.move_agent(ww.cur_row, ww.cur_col)
-        #         elif event.key == pg.K_LEFT:
-        #             if ww.cur_col > 0:
-        #                 ww.cur_col -= 1
-        #                 draw.fill_env(ww.cur_row, ww.cur_col, ww.world)   
-        #                 ww.move_agent(ww.cur_row, ww.cur_col)
-        #         elif event.key == pg.K_DOWN:
-        #             if ww.cur_row < 3:
-        #                 ww.cur_row += 1
-        #                 draw.fill_env(ww.cur_row, ww.cur_col, ww.world)  
-        #                 ww.move_agent(ww.cur_row, ww.cur_col)
-        #         elif event.key == pg.K_UP:
-        #             if ww.cur_row > 0:
-        #                 ww.cur_row -= 1
-        #                 draw.fill_env(ww.cur_row, ww.cur_col, ww.world)   
-        #                 ww.move_agent(ww.cur_row, ww.cur_col)
-   
-                
-        #         ww.path[ww.cur_row][ww.cur_col] = 1   
-
-        # for row in range(4):
-        #     for col in range(4):
-        #         if ww.path[row][col]:
-        #             draw.fill_env(row, col, ww.world)
-        #         draw.agent(ww.cur_row, ww.cur_col, ww.agent.facing)    
+                            
 
         draw.score(f"{ww.agent.score}", GREEN)
         draw.status("Click the 'Play AI' button!", WHITE)    
-        
         draw.agent(ww.cur_row, ww.cur_col, ww.agent.facing)  
-        
         
         draw.board()
         pg.display.flip()
@@ -277,18 +227,6 @@ def main():
                     description()
 
         pg.display.flip()
-    
-def winning_rate_to_lose():
-    global lost
-    global win
-    global total_games
-    print(total_games, lost, win)
-    # Calculate the winning rate
-    if total_games > 0:
-        winning_rate = ((total_games - lost) / total_games) * 100
-        return round(winning_rate, 2) 
-    else:
-        return 0.00  # Avoid division by zero error
 
 
 if __name__ == "__main__":
