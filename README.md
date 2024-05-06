@@ -29,6 +29,23 @@ Welcome to the Wumpus Game Space Edition! Explore the depths of space in this ad
    
 5. **Winning Condition**:
    - Retrieve the gold and make it back to the starting position.
+     
+
+## How to Run
+
+1. Clone this repository.  ` https://github.com/Vcarmelli/wumpus-world.git  `
+2. Navigate to the directory containing the game files.
+3. Run the following command:
+
+```bash
+python main.py
+```
+
+
+## Dependencies
+- Python 3.11
+- Pygame 2.5.2
+
 
 ## Screenshots
 
@@ -57,20 +74,6 @@ Here are some screenshots of the game:
 
 ![Winning Phase](screenshots/wumpus-world.gif)
 
-
-## Dependencies
-- Python 3.11
-- Pygame 2.5.2
-
-## How to Run
-
-1. Clone this repository.  ` https://github.com/Vcarmelli/wumpus-world.git  `
-2. Navigate to the directory containing the game files.
-3. Run the following command:
-
-```bash
-python main.py
-```
 
 _Enjoy the adventure in the Wumpus World!_
 
