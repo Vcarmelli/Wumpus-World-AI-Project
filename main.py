@@ -9,7 +9,6 @@ from draw import Draw
 from game import WumpusWorld
 
 
-
 space = 85
 
 AQUA = (49, 255, 255)
@@ -30,17 +29,11 @@ def generate_board():
     board = np.zeros((4, 4))
     return board
 
-def get_coord(pos):
-    dif = 400 / 4
-    x = pos[0]//dif
-    y = pos[1]//dif
-    return [y, x]
 
 def over():
     draw = Draw(screen)
 
     while True:
-        
         MOUSE_POS = pg.mouse.get_pos()
         btn_reset = Button((550, 250), " Reset ", GREEN, LIGHT_GREEN)
         btn_back = Button((680, 250), " Menu ", GREEN, LIGHT_GREEN)
@@ -50,9 +43,10 @@ def over():
             button.draw_button(screen)
 
         for event in pg.event.get():
-            
             if event.type == pg.QUIT: 
-                confirm_quit() 
+                if confirm_quit():
+                    pg.quit()
+                    sys.exit()
 
             if event.type == pg.MOUSEBUTTONDOWN:
                     
@@ -91,9 +85,10 @@ def wumpus_world():
             
         draw.fill_env(ww.cur_row, ww.cur_col, ww.world)        
         for event in pg.event.get():
-            
             if event.type == pg.QUIT: 
-                confirm_quit() 
+                if confirm_quit():
+                    pg.quit()
+                    sys.exit()
 
             if event.type == pg.MOUSEBUTTONDOWN:
                 
@@ -161,14 +156,11 @@ def wumpus_world():
                             ww.agent.w_found = False
                             pg.display.update()
 
-                        elif grabbed and killed:
-                            draw.status(" Treasure found and Wumpus killed!", AQUA) 
                         else:
                             pass      
 
                         pg.display.update()
                             
-
         draw.score(f"{ww.agent.score}", GREEN)
         draw.status("Click the 'Play AI' button!", WHITE)    
         draw.agent(ww.cur_row, ww.cur_col, ww.agent.facing)  
@@ -182,7 +174,6 @@ def description():
     screen.blit(game_bg, (0,0))
     
     while True:
-        
         MOUSE_POS = pg.mouse.get_pos()
 
         btn_back = Button((710, 490), "Back \u25BA", BLUE, LIGHT_GREEN)
@@ -191,9 +182,10 @@ def description():
         btn_back.draw_button_transparent(screen)
 
         for event in pg.event.get():
-            
             if event.type == pg.QUIT: 
-                confirm_quit() 
+                if confirm_quit():
+                    pg.quit()
+                    sys.exit()
 
             if event.type == pg.MOUSEBUTTONDOWN:
 
@@ -204,7 +196,7 @@ def description():
 
 
 def confirm_quit():
-
+    global confirm
     def center_window(window):
         window.update_idletasks()
         width = window.winfo_width()
@@ -217,9 +209,14 @@ def confirm_quit():
         webbrowser.open("https://github.com/Vcarmelli/wumpus-world.git")
 
     def quit_game():
+        global confirm
         custom_dialog.destroy()
-        pg.quit()
-        sys.exit()
+        confirm = True
+
+    def destroy_dialog():
+        global confirm
+        custom_dialog.destroy()
+        confirm = False
 
     root = tk.Tk()
     root.withdraw()
@@ -232,7 +229,7 @@ def confirm_quit():
     message_label = tk.Label(custom_dialog, text="Leaving the Wumpus World.\nIs it time to conquer new realms? 🚀", bg="white")
     message_label.pack(padx=40, pady=20)
 
-    no_button = ttk.Button(custom_dialog, text="No", style="Custom.TButton", command=custom_dialog.destroy)
+    no_button = ttk.Button(custom_dialog, text="No", style="Custom.TButton", command=destroy_dialog)
     no_button.pack(side="right", padx=(5, 25), pady=15)
     yes_button = ttk.Button(custom_dialog, text="Yes", style="Custom.TButton", command=quit_game)
     yes_button.pack(side="right", padx=(25, 5), pady=15)
@@ -243,7 +240,7 @@ def confirm_quit():
 
     center_window(custom_dialog)
     root.wait_window(custom_dialog)
-
+    return confirm
 
 
 def main():
@@ -251,7 +248,6 @@ def main():
     screen.blit(menu_bg, (0,0))
 
     while True:
-
         MOUSE_POS = pg.mouse.get_pos()
 
         start = Button((370, 480), "Start Game", BLUE, LIGHT_GREEN)
@@ -263,10 +259,11 @@ def main():
             controls.draw_button_transparent(screen)
 
         for event in pg.event.get():
-            
             if event.type == pg.QUIT: 
-                confirm_quit() 
-                
+                if confirm_quit():
+                    pg.quit()
+                    sys.exit()
+
             if event.type == pg.MOUSEBUTTONDOWN:
                 if start.click_button(MOUSE_POS):
                     wumpus_world()
