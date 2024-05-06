@@ -9,17 +9,13 @@ class Helper:
         for i in range(WORLD_SIZE):
             if row_col == 'C':
                 if i == wumpus_pos[1]:
-                    print("Checking column:", i)
-                    print("Agent pos:", agent_pos)
                     if agent_y == wumpus_pos[1]:
-                        print("COLUMN:", i, wumpus_pos[1])
+                        print("Wumpus killed in COLUMN:", i)
                         return True
             elif row_col == 'R':
                 if i == wumpus_pos[0]:
-                    print("Checking row:", i)
-                    print("Agent pos:", agent_pos)
                     if agent_x == wumpus_pos[0]:
-                        print("ROW:", i, wumpus_pos[0])
+                        print("Wumpus killed in ROW:", i)
                         return True
         return False
     

@@ -152,6 +152,8 @@ def wumpus_world():
                                     ww.g_w_p_coords[1] = None
                                     draw.status(" Wumpus scream! You killed Wumpus.", WHITE)  
                                     ww.agent.score += 2000
+                                else:
+                                    draw.status("Wumpus not killed!", AQUA)  
                                 arrows_count -= 1
 
                             ww.agent.w_found = False

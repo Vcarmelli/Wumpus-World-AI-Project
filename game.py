@@ -59,6 +59,7 @@ class WumpusWorld:
             self.world = func.assign_char(row, col, chars[i], self.world)
         self.add_stench_breeze()
 
+        print("INITIALIZE WORLD")
         func.print_world(self.world)
         self.perceive_agent(self.cur_row, self.cur_col)
 
@@ -74,13 +75,12 @@ class WumpusWorld:
         self.agent.reset_sensor()
 
         self.perceive_agent(x, y)
-        self.agent.clear_safe()   
         print("AGENT INFERENCE")  
         func.print_world(self.agent.kb.inference)
         self.locate_agent()
         self.world = func.assign_char(x, y, 'A', self.world)
         self.agent.score -= 1
-        print("WORLD", self.world)
+        print("WORLD")
         func.print_world(self.world)
 
 
@@ -129,20 +129,18 @@ class WumpusWorld:
         if direction == 'N' or direction == 'S':
             if func.check_row_column(self.agent.location, wumpus_xy, 'C'):
                 self.world = func.remove_char(wumpus_xy[0], wumpus_xy[1], 'W', self.world[:])
-                print("KILLED ", wumpus_xy)
                 self.agent.w_killed = True
                 self.agent.perceive_scream(self.agent.location, 'C')
                 return True
         elif direction == 'E' or direction == 'W':
             if func.check_row_column(self.agent.location, wumpus_xy, 'R'):
                 self.world = func.remove_char(wumpus_xy[0], wumpus_xy[1], 'W', self.world[:])
-                print("KILLED ", wumpus_xy)
                 self.agent.w_killed = True
-                self.agent.perceive_scream(self.agent.location, 'C')
+                self.agent.perceive_scream(self.agent.location, 'R')
                 return True
 
-        print("NOT KILLED wumpus_xy", wumpus_xy)
-        print("direction", self.agent.facing)
+        print("Wumpus not killed:", wumpus_xy)
+        print("direction:", self.agent.facing)
         return False
     
 
@@ -180,20 +178,20 @@ class Agent:
 
     def perceive_scream(self, xy, row_col):
         percept = "Scream"
-        if row_col == 'C': 
+        if row_col == 'R': 
+            
             for j in range(WORLD_SIZE):
-                if percept in self.sensor:
+                if percept in self.sensor:  # set 'Scream' to TRUE in that row 
                     self.sensor[percept] = True 
                     self.kb.add((xy[0], j), self.sensor)
-                print(self.kb.world_info[xy[0]][j]['Scream'])
-        elif row_col == 'R':  
+                    self.reset_sensor()
+                
+        elif row_col == 'C':  
             for i in range(WORLD_SIZE):
-                if percept in self.sensor:
+                if percept in self.sensor:  # set 'Scream' to TRUE in that column 
                     self.sensor[percept] = True 
                     self.kb.add((i, xy[1]), self.sensor)
-                print(self.kb.world_info[[i]][xy[1]]['Scream'])
-
-        self.kb.print_world_info()
+                    self.reset_sensor()
     
 
     def reset_sensor(self):
@@ -238,10 +236,10 @@ class Agent:
     def is_move_safe(self, x, y):
         if not self.kb.world_info[x][y]:    # no knowledge 
             return 0
-        elif all(value is None for value in self.kb.world_info[x][y].values()):
-            print(f'({x}, {y}) is safe')   # cell is safe base on the knwoledge from the senses
+        elif all(value is None or key in ['Bump', 'Scream'] for key, value in self.kb.world_info[x][y].items()):  # cell is safe even if 'Bump' or 'Scream' are true 
+            #print(f'({x}, {y}) is safe')   # cell is safe base on the knwoledge from the senses
             return 1
-        elif any(value is None for value in self.kb.world_info[x][y].values()):
+        elif any(key in ['Breeze', 'Stench'] and value for key, value in self.kb.world_info[x][y].items()): 
             true_values = [key for key, value in self.kb.world_info[x][y].items() if value is True]
             print(f'There is a {true_values} in ({x}, {y})')
             return -1
@@ -293,7 +291,6 @@ class Agent:
 
     def infer(self):
         predict = { 'Stench': 'W', 'Breeze': 'P', 'Glitter': 'G'}
-
         checked_stench = True
         for i in range(WORLD_SIZE):
             for j in range(WORLD_SIZE):
@@ -305,7 +302,6 @@ class Agent:
                             for pattern in self.kb.possible_pos:
                                 if all(self.kb.world_info[coord[0]][coord[1]].get(key) for coord in pattern["pattern"]):
                                     row, col = pattern["location"]
-                                    print("infer kb: ", self.kb.inference)
                                     self.kb.inference = func.assign_char(row, col, prediction, self.kb.inference)
                                     if key == "Stench" and not self.w_found:
                                         if self.check_stench_pattern(pattern): 
@@ -313,31 +309,25 @@ class Agent:
                                         if checked_stench:        
                                             self.wumpus_located(row, col, True)
                                             self.direction(1, 1) if pattern["location"] == (0, 0) else self.direction(row, col) 
-                                            print("FACE AFTER STENCH: ", self.facing)
-                                            print("pattern['location']", pattern["location"])
                                             self.kb.possible_pos.remove(pattern)
-                                            print("Pattern removed:", pattern)
                                             checked_stench = False
+        self.clear_safe()
 
 
     def check_stench_pattern(self, pattern):
         if len(pattern["pattern"]) == 3:
-            print("CHECK 3 PATTERNS")
             if all(self.kb.world_info[coord[0]][coord[1]].get("Stench") for coord in pattern["pattern"]):                
                 row, col = pattern["location"]
                 self.wumpus_located(row, col, True)
                 self.direction(row, col)
-                print("FACE AFTER 3 PATTS: ", self.facing)
-                print(row, col)
             return True
-        print("NOCHECK 3")
         return False
 
     def clear_safe(self):
         for x in range(WORLD_SIZE):
             for y in range(WORLD_SIZE):
                 if self.kb.world_info[x][y]:
-                    if all(value is None for value in self.kb.world_info[x][y].values()):
+                    if all(value is None or key in ['Bump', 'Scream'] for key, value in self.kb.world_info[x][y].items()):
                         self.kb.inference[x][y] = ''
                 elif self.kb.inference[x][y] != '':
                     if (x, y) not in self.unsafe: self.unsafe.append((x, y))  # reconrd unsafe cells based on prediction
@@ -345,8 +335,7 @@ class Agent:
 
     def predict_unsafe(self, x, y):
         if (x, y) in self.unsafe:
-            print("Unsafe Cells:", self.unsafe) # base on patterns of hints
-            print((x, y))
+            #print("Unsafe Cells:", self.unsafe) # base on patterns of hints
             return True
         return False
 
@@ -364,7 +353,7 @@ class Knowledge:
 
     def add(self, pos, sensors):
         self.world_info[pos[0]][pos[1]] = sensors.copy()
-        print('pos:', pos)
+        print("KB of World")
         self.print_world_info()
 
 
