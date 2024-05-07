@@ -1,4 +1,4 @@
-# ✨Wumpus World Game (Space Edition)
+# ✨Wumpus World Game
 
 Welcome to the Wumpus Game Space Edition! Explore the depths of space in this adaptation of the classic Wumpus World game.
 
